@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { initializeUserSkill } from '../services/progressService';
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ export default function OnboardingPage() {
   const [category, setCategory] = useState('');
   const [skill, setSkill] = useState('');
   const [dailyMinutes, setDailyMinutes] = useState('30');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const categories = ['Study', 'Health'];
   const skillsByCategory = {
@@ -16,12 +19,21 @@ export default function OnboardingPage() {
     Health: ['Gym'],
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // TODO: Save to Firestore and navigate to dashboard
-      navigate('/dashboard');
+      // Save to Firestore and navigate
+      setLoading(true);
+      setError(null);
+      try {
+        const skillId = skill.toLowerCase().replace(' ', '-');
+        await initializeUserSkill(user.uid, skillId, category, parseInt(dailyMinutes));
+        navigate('/dashboard');
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
     }
   };
 
@@ -35,6 +47,12 @@ export default function OnboardingPage() {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
       <div className="card max-w-md w-full mx-4">
         <h1 className="text-2xl font-bold mb-6">Set Up Your Journey</h1>
+
+        {error && (
+          <div className="mb-4 p-3 bg-danger/10 text-danger rounded-lg text-sm">
+            {error}
+          </div>
+        )}
 
         {step === 1 && (
           <div>
@@ -88,6 +106,8 @@ export default function OnboardingPage() {
               onChange={(e) => setDailyMinutes(e.target.value)}
               className="input"
               placeholder="Minutes per day"
+              min="5"
+              max="480"
             />
             <p className="text-sm text-gray-500 mt-2">
               {dailyMinutes} minutes per day
@@ -106,13 +126,14 @@ export default function OnboardingPage() {
           <button
             onClick={handleNext}
             disabled={
+              loading ||
               (step === 1 && !category) ||
               (step === 2 && !skill) ||
               (step === 3 && !dailyMinutes)
             }
             className="btn btn-primary flex-1 disabled:opacity-50"
           >
-            {step === 3 ? 'Start' : 'Next'}
+            {loading ? 'Saving...' : step === 3 ? 'Start' : 'Next'}
           </button>
         </div>
 
