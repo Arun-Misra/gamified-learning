@@ -17,6 +17,9 @@ create table if not exists roadmaps (
   name text not null,
   version integer not null default 1,
   tracks jsonb not null default '[]'::jsonb,
+  created_by_user_id uuid references auth.users(id) on delete cascade,
+  is_user_generated boolean not null default false,
+  source_goal_text text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -26,6 +29,10 @@ create table if not exists user_skills (
   user_id uuid not null references auth.users(id) on delete cascade,
   skill_id text not null references roadmaps(skill_id) on delete cascade,
   category text not null,
+  goal_type text not null default 'study',
+  goal_mode text not null default 'hybrid',
+  goal_config jsonb not null default '{}'::jsonb,
+  adaptation_state jsonb not null default '{"adjustment":1.0,"lastEvaluation":null}'::jsonb,
   daily_minutes integer not null default 30,
   current_topic_ids text[] not null default '{}'::text[],
   completed_topic_ids text[] not null default '{}'::text[],
@@ -61,6 +68,15 @@ create table if not exists activities (
   meta jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default timezone('utc', now())
 );
+
+alter table roadmaps add column if not exists created_by_user_id uuid references auth.users(id) on delete cascade;
+alter table roadmaps add column if not exists is_user_generated boolean not null default false;
+alter table roadmaps add column if not exists source_goal_text text;
+
+alter table user_skills add column if not exists goal_type text not null default 'study';
+alter table user_skills add column if not exists goal_mode text not null default 'hybrid';
+alter table user_skills add column if not exists goal_config jsonb not null default '{}'::jsonb;
+alter table user_skills add column if not exists adaptation_state jsonb not null default '{"adjustment":1.0,"lastEvaluation":null}'::jsonb;
 
 alter table profiles enable row level security;
 alter table roadmaps enable row level security;

@@ -14,6 +14,10 @@ const mapSkillRow = (row) => {
     uid: row.user_id,
     skillId: row.skill_id,
     category: row.category,
+    goalType: row.goal_type || 'study',
+    goalMode: row.goal_mode || 'hybrid',
+    goalConfig: row.goal_config || {},
+    adaptationState: row.adaptation_state || { adjustment: 1.0, lastEvaluation: null },
     dailyMinutes: row.daily_minutes,
     currentTopicIds: row.current_topic_ids || [],
     completedTopicIds: row.completed_topic_ids || [],
@@ -29,16 +33,27 @@ const mapSkillRow = (row) => {
 /**
  * Initialize user skill progress document
  */
-export const initializeUserSkill = async (uid, skillId, category, dailyMinutes) => {
+export const initializeUserSkill = async (uid, skillId, category, dailyMinutes, options = {}) => {
   try {
     const now = new Date().toISOString();
     const skillKey = `${uid}_${skillId}`;
+    const goalMode = options.goalMode || 'hybrid';
+    const goalType = options.goalType || category?.toLowerCase() || 'custom';
+    const goalConfig = options.goalConfig || {};
+    const adaptationState = options.adaptationState || {
+      adjustment: 1.0,
+      lastEvaluation: null,
+    };
 
     const payload = {
       id: skillKey,
       user_id: uid,
       skill_id: skillId,
       category,
+      goal_type: goalType,
+      goal_mode: goalMode,
+      goal_config: goalConfig,
+      adaptation_state: adaptationState,
       daily_minutes: dailyMinutes,
       current_topic_ids: [],
       completed_topic_ids: [],
@@ -54,7 +69,29 @@ export const initializeUserSkill = async (uid, skillId, category, dailyMinutes) 
     });
 
     if (error) {
-      throw error;
+      // Backward-compatible fallback for environments not yet migrated.
+      const fallbackPayload = {
+        id: payload.id,
+        user_id: payload.user_id,
+        skill_id: payload.skill_id,
+        category: payload.category,
+        daily_minutes: payload.daily_minutes,
+        current_topic_ids: payload.current_topic_ids,
+        completed_topic_ids: payload.completed_topic_ids,
+        xp: payload.xp,
+        level: payload.level,
+        streak_count: payload.streak_count,
+        last_active_date: payload.last_active_date,
+        updated_at: payload.updated_at,
+      };
+
+      const { error: fallbackError } = await supabase.from('user_skills').upsert(fallbackPayload, {
+        onConflict: 'user_id,skill_id',
+      });
+
+      if (fallbackError) {
+        throw fallbackError;
+      }
     }
   } catch (error) {
     console.error('Error initializing user skill:', error);
