@@ -1,28 +1,25 @@
 /**
- * Mission generator based on roadmap progress
+ * Mission generator based on roadmap progress and planner mode.
  */
 export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
   if (!roadmap || !userProgress) {
     return [];
   }
 
-  const missions = [];
-  let remainingTime = Math.max(20, dailyMinutes || 30);
   const completedTopicIds = new Set(userProgress.completedTopicIds || []);
+  const goalMode = (userProgress.goalMode || 'hybrid').toLowerCase();
+  const resolvedSkillId = (userProgress.skillId || roadmap.skillId || '').toLowerCase();
 
-  // Flatten all topics from tracks
   const allTopics = [];
-  if (roadmap.tracks && Array.isArray(roadmap.tracks)) {
+  if (Array.isArray(roadmap.tracks)) {
     roadmap.tracks.forEach((track) => {
-      if (track.topics && Array.isArray(track.topics)) {
+      if (Array.isArray(track.topics)) {
         allTopics.push(...track.topics);
       }
     });
   }
 
   const incompleteTopics = allTopics.filter((topic) => !completedTopicIds.has(topic.topicId));
-
-  const resolvedSkillId = (userProgress.skillId || roadmap.skillId || '').toLowerCase();
 
   if (resolvedSkillId === 'gym') {
     const gymTopics = incompleteTopics.length ? incompleteTopics : buildGymMaintenanceTopics();
@@ -33,21 +30,160 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
     return [];
   }
 
+  if (goalMode === 'daily') {
+    return buildDailyModeMissions(incompleteTopics, dailyMinutes, userProgress, roadmap);
+  }
+
+  if (goalMode === 'level') {
+    return buildLevelModeMissions(incompleteTopics, dailyMinutes, userProgress, roadmap);
+  }
+
+  return buildHybridModeMissions(incompleteTopics, dailyMinutes, userProgress, roadmap);
+};
+
+const buildLevelModeMissions = (incompleteTopics, dailyMinutes, userProgress, roadmap) => {
   const skillName = userProgress.skillId || roadmap.skillId || 'your skill';
   const primaryTopic = incompleteTopics[0];
   const secondaryTopic = incompleteTopics[1] || primaryTopic;
-  const challengeTopic = incompleteTopics.find((topic) => topic.difficulty === 'hard') || secondaryTopic;
+  const challengeTopic = incompleteTopics[2] || incompleteTopics.find((topic) => topic.difficulty === 'hard') || secondaryTopic;
 
+  let remainingTime = Math.max(20, dailyMinutes || 30);
+  const levelPlan = [
+    {
+      missionType: 'milestone-push',
+      topic: primaryTopic,
+      minMinutes: 20,
+      fraction: 0.45,
+      details: (topic) => ({
+        title: `Milestone Push: ${topic.title}`,
+        description: `Advance the next milestone for ${topic.title} with one clear, testable artifact.`,
+        successCriteria: [
+          'Complete one milestone deliverable',
+          'Document one blocker and how you resolved it',
+        ],
+      }),
+    },
+    {
+      missionType: 'precision-drill',
+      topic: secondaryTopic,
+      minMinutes: 12,
+      fraction: 0.25,
+      details: (topic) => ({
+        title: `Precision Drill: ${topic.title}`,
+        description: 'Run focused reps and tighten error rate or execution quality.',
+        successCriteria: [
+          'Complete at least 3 focused reps',
+          'Track one measurable metric per rep',
+        ],
+      }),
+    },
+    {
+      missionType: 'level-checkpoint',
+      topic: challengeTopic,
+      minMinutes: 12,
+      fraction: 0.2,
+      details: (topic) => ({
+        title: `Checkpoint Challenge: ${topic.title}`,
+        description: 'Do one realistic challenge attempt to validate this level.',
+        successCriteria: [
+          'Attempt one end-to-end challenge',
+          'Capture pass/fail notes with next improvement',
+        ],
+      }),
+    },
+    {
+      missionType: 'review-log',
+      topic: primaryTopic,
+      minMinutes: 8,
+      fraction: 0.1,
+      details: () => ({
+        title: `Level Review: ${skillName}`,
+        description: 'Close out the day by recording insights and tomorrow\'s first move.',
+        successCriteria: ['Write 3 takeaways', 'Define tomorrow\'s first 10-minute action'],
+      }),
+    },
+  ];
+
+  return levelPlan.reduce((result, plan, index) => {
+    if (remainingTime < 8) {
+      return result;
+    }
+
+    const baseEstimate = plan.topic?.estimatedMinutes || 20;
+    const computedMinutes = Math.floor(Math.min(baseEstimate, (dailyMinutes || 30) * plan.fraction));
+    const estimatedMinutes = Math.max(plan.minMinutes, Math.min(remainingTime, computedMinutes || plan.minMinutes));
+    const detail = plan.details(plan.topic || primaryTopic);
+    const difficulty = plan.topic?.difficulty || 'medium';
+
+    result.push({
+      missionId: `mission-${plan.topic?.topicId || 'general'}-${Date.now()}-level-${index}`,
+      topicId: plan.topic?.topicId || null,
+      title: detail.title,
+      description: detail.description,
+      successCriteria: detail.successCriteria,
+      missionType: plan.missionType,
+      difficulty,
+      estimatedMinutes,
+      xpReward: computeXpReward(difficulty, estimatedMinutes, plan.missionType),
+      status: 'pending',
+      completedAt: null,
+    });
+
+    remainingTime -= estimatedMinutes;
+    return result;
+  }, []);
+};
+
+const buildDailyModeMissions = (incompleteTopics, dailyMinutes, userProgress, roadmap) => {
+  const skillName = roadmap.name || userProgress.skillId || roadmap.skillId || 'your goal';
+  const seedTopic = incompleteTopics[0];
+
+  const dailyTopics = [
+    {
+      topicId: seedTopic?.topicId || 'daily-anchor',
+      title: `Daily Foundation: ${skillName}`,
+      difficulty: 'easy',
+      estimatedMinutes: 20,
+    },
+    {
+      topicId: incompleteTopics[1]?.topicId || 'daily-practice',
+      title: `Daily Practice: ${skillName}`,
+      difficulty: 'medium',
+      estimatedMinutes: 25,
+    },
+    {
+      topicId: incompleteTopics[2]?.topicId || 'daily-application',
+      title: `Daily Application: ${skillName}`,
+      difficulty: 'medium',
+      estimatedMinutes: 25,
+    },
+    {
+      topicId: 'daily-review',
+      title: `Daily Review: ${skillName}`,
+      difficulty: 'easy',
+      estimatedMinutes: 12,
+    },
+  ];
+
+  return buildDailyLoopMissions(dailyTopics, dailyMinutes, skillName);
+};
+
+const buildHybridModeMissions = (incompleteTopics, dailyMinutes, userProgress, roadmap) => {
+  const skillName = userProgress.skillId || roadmap.skillId || 'your skill';
+  const primaryTopic = incompleteTopics[0];
+  const secondaryTopic = incompleteTopics[1] || primaryTopic;
+  const challengeTopic = incompleteTopics.find((topic) => topic.difficulty === 'hard') || incompleteTopics[2] || secondaryTopic;
+
+  let remainingTime = Math.max(20, dailyMinutes || 30);
   const missionBlueprints = [
     {
       missionType: 'deep-work',
       topic: primaryTopic,
-      timeFraction: 0.45,
-      minMinutes: 20,
+      timeFraction: 0.35,
+      minMinutes: 18,
       build: (topic) => ({
         title: `Deep Work Sprint: ${topic.title}`,
-        description:
-          `Work in one focused block on ${topic.title}. Produce a concrete output (notes, code, reps, or drill log).`,
+        description: `Work in one focused block on ${topic.title}. Produce a concrete output (notes, code, reps, or drill log).`,
         successCriteria: [
           'Complete one uninterrupted focus block',
           'Ship one tangible output',
@@ -58,8 +194,8 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
     {
       missionType: 'skill-drill',
       topic: secondaryTopic,
-      timeFraction: 0.25,
-      minMinutes: 12,
+      timeFraction: 0.2,
+      minMinutes: 10,
       build: (topic) => ({
         title: `Skill Drill: ${topic.title}`,
         description: `Run 3 fast repetitions for ${topic.title} with immediate corrections after each rep.`,
@@ -70,10 +206,24 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
       }),
     },
     {
+      missionType: 'daily-loop-anchor',
+      topic: primaryTopic,
+      timeFraction: 0.25,
+      minMinutes: 12,
+      build: (topic) => ({
+        title: `Daily Loop Anchor: ${topic.title}`,
+        description: `Run a repeatable daily practice block for ${topic.title} and log consistency quality.`,
+        successCriteria: [
+          'Complete one repeatable practice cycle',
+          'Track quality score out of 10',
+        ],
+      }),
+    },
+    {
       missionType: 'applied-challenge',
       topic: challengeTopic,
-      timeFraction: 0.2,
-      minMinutes: 10,
+      timeFraction: 0.12,
+      minMinutes: 8,
       build: (topic) => ({
         title: `Applied Challenge: ${topic.title}`,
         description: `Use ${topic.title} in a mini real-world challenge. Keep it small but complete.`,
@@ -86,7 +236,7 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
     {
       missionType: 'review-log',
       topic: primaryTopic,
-      timeFraction: 0.1,
+      timeFraction: 0.08,
       minMinutes: 8,
       build: () => ({
         title: `Review Log: ${skillName}`,
@@ -99,13 +249,15 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
     },
   ];
 
+  const missions = [];
+
   missionBlueprints.forEach((blueprint, index) => {
     if (remainingTime < 8) {
       return;
     }
 
     const baseEstimate = blueprint.topic?.estimatedMinutes || 20;
-    const computedMinutes = Math.floor(Math.min(baseEstimate, dailyMinutes * blueprint.timeFraction));
+    const computedMinutes = Math.floor(Math.min(baseEstimate, (dailyMinutes || 30) * blueprint.timeFraction));
     const estimatedMinutes = Math.max(blueprint.minMinutes, Math.min(remainingTime, computedMinutes || blueprint.minMinutes));
     const difficulty = blueprint.topic?.difficulty || (blueprint.missionType === 'review-log' ? 'easy' : 'medium');
     const detail = blueprint.build(blueprint.topic || primaryTopic);
@@ -127,9 +279,8 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
     remainingTime -= estimatedMinutes;
   });
 
-  // If user still has time budget, add one optional stretch mission from the next incomplete topic.
-  if (remainingTime >= 10 && incompleteTopics[2]) {
-    const stretchTopic = incompleteTopics[2];
+  if (remainingTime >= 10 && incompleteTopics[3]) {
+    const stretchTopic = incompleteTopics[3];
     const stretchMinutes = Math.min(remainingTime, Math.max(10, Math.floor((stretchTopic.estimatedMinutes || 20) * 0.4)));
 
     missions.push({
@@ -146,6 +297,78 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
       completedAt: null,
     });
   }
+
+  return missions;
+};
+
+const buildDailyLoopMissions = (topics, dailyMinutes, skillName = 'your goal') => {
+  const missionPlan = [
+    {
+      missionType: 'daily-foundation',
+      titlePrefix: 'Foundation Block',
+      minMinutes: 8,
+      fraction: 0.25,
+      difficultyFallback: 'easy',
+      criteria: ['Review previous notes and context', 'Define one sharp outcome for this block'],
+    },
+    {
+      missionType: 'daily-practice',
+      titlePrefix: 'Practice Block',
+      minMinutes: 12,
+      fraction: 0.35,
+      difficultyFallback: 'medium',
+      criteria: ['Complete at least 3 quality reps', 'Track one metric per rep'],
+    },
+    {
+      missionType: 'daily-application',
+      titlePrefix: 'Application Block',
+      minMinutes: 10,
+      fraction: 0.25,
+      difficultyFallback: 'medium',
+      criteria: ['Finish one mini real-world task', 'Capture one lesson learned'],
+    },
+    {
+      missionType: 'daily-review',
+      titlePrefix: 'Review Block',
+      minMinutes: 8,
+      fraction: 0.15,
+      difficultyFallback: 'easy',
+      criteria: ['Write 3 takeaways', 'Set tomorrow\'s first 10-minute action'],
+    },
+  ];
+
+  let remainingTime = Math.max(20, dailyMinutes || 30);
+  const pool = topics.length
+    ? topics
+    : [{ topicId: 'daily-default', title: `Daily Loop: ${skillName}`, difficulty: 'medium', estimatedMinutes: 20 }];
+  const missions = [];
+
+  missionPlan.forEach((plan, index) => {
+    if (remainingTime < 8) {
+      return;
+    }
+
+    const topic = pool[index % pool.length];
+    const estimatedByFraction = Math.floor((dailyMinutes || 30) * plan.fraction);
+    const estimatedMinutes = Math.max(plan.minMinutes, Math.min(remainingTime, estimatedByFraction || plan.minMinutes));
+    const difficulty = topic?.difficulty || plan.difficultyFallback;
+
+    missions.push({
+      missionId: `mission-${topic?.topicId || 'daily'}-${Date.now()}-daily-${index}`,
+      topicId: topic?.topicId || null,
+      title: `${plan.titlePrefix}: ${topic?.title || skillName}`,
+      description: `Run this ${plan.titlePrefix.toLowerCase()} for ${skillName} and log one measurable result.`,
+      successCriteria: plan.criteria,
+      missionType: plan.missionType,
+      difficulty,
+      estimatedMinutes,
+      xpReward: computeXpReward(difficulty, estimatedMinutes, plan.missionType),
+      status: 'pending',
+      completedAt: null,
+    });
+
+    remainingTime -= estimatedMinutes;
+  });
 
   return missions;
 };
@@ -239,6 +462,14 @@ const computeXpReward = (difficulty, estimatedMinutes, missionType) => {
     'deep-work': 8,
     'skill-drill': 5,
     'applied-challenge': 9,
+    'milestone-push': 10,
+    'precision-drill': 6,
+    'level-checkpoint': 8,
+    'daily-loop-anchor': 7,
+    'daily-foundation': 5,
+    'daily-practice': 7,
+    'daily-application': 8,
+    'daily-review': 4,
     'review-log': 4,
     'stretch-goal': 12,
     'warmup-primer': 4,
@@ -252,7 +483,7 @@ const computeXpReward = (difficulty, estimatedMinutes, missionType) => {
 };
 
 /**
- * Calculate XP reward based on difficulty and time spent
+ * Calculate XP reward based on difficulty and time spent.
  */
 export const calculateXpReward = (difficulty, estimatedMinutes) => {
   const baseXp = Math.floor(estimatedMinutes / 5);

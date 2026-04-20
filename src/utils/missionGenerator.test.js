@@ -16,10 +16,11 @@ const buildRoadmap = () => ({
 });
 
 describe('generateDailyMissions', () => {
-  test('creates richer mission types with success criteria', () => {
+  test('creates richer mission types with success criteria in hybrid mode', () => {
     const roadmap = buildRoadmap();
     const userProgress = {
       skillId: 'python',
+      goalMode: 'hybrid',
       completedTopicIds: ['python-l001', 'python-l002', 'python-l003'],
       dailyMinutes: 90,
     };
@@ -27,13 +28,58 @@ describe('generateDailyMissions', () => {
     const missions = generateDailyMissions(roadmap, userProgress, 90);
 
     expect(missions.length).toBeGreaterThan(0);
-    expect(missions[0]).toMatchObject({
-      title: expect.stringContaining('Deep Work'),
-      missionType: 'deep-work',
-      status: 'pending',
-    });
+    expect(missions[0]).toMatchObject({ status: 'pending' });
     expect(Array.isArray(missions[0].successCriteria)).toBe(true);
-    expect(missions.some((mission) => mission.missionType === 'stretch-goal')).toBe(true);
+    expect(missions.some((mission) => mission.missionType === 'daily-loop-anchor')).toBe(true);
+  });
+
+  test('creates level-focused mission mix in level mode', () => {
+    const roadmap = buildRoadmap();
+    const userProgress = {
+      skillId: 'python',
+      goalMode: 'level',
+      completedTopicIds: ['python-l001'],
+      dailyMinutes: 75,
+    };
+
+    const missions = generateDailyMissions(roadmap, userProgress, 75);
+    const missionTypes = missions.map((mission) => mission.missionType);
+
+    expect(missionTypes).toContain('milestone-push');
+    expect(missionTypes).toContain('level-checkpoint');
+    expect(missionTypes).not.toContain('daily-loop-anchor');
+  });
+
+  test('creates repeatable daily loop mission mix in daily mode', () => {
+    const roadmap = buildRoadmap();
+    const userProgress = {
+      skillId: 'python',
+      goalMode: 'daily',
+      completedTopicIds: ['python-l001'],
+      dailyMinutes: 60,
+    };
+
+    const missions = generateDailyMissions(roadmap, userProgress, 60);
+    const missionTypes = missions.map((mission) => mission.missionType);
+
+    expect(missionTypes).toContain('daily-foundation');
+    expect(missionTypes).toContain('daily-practice');
+    expect(missionTypes).toContain('daily-review');
+  });
+
+  test('does not output generic mission titles', () => {
+    const roadmap = buildRoadmap();
+    const userProgress = {
+      skillId: 'python',
+      goalMode: 'hybrid',
+      completedTopicIds: [],
+      dailyMinutes: 80,
+    };
+
+    const missions = generateDailyMissions(roadmap, userProgress, 80);
+    const genericPattern = /^level\s+\d+$/i;
+
+    expect(missions.every((mission) => !genericPattern.test((mission.title || '').trim()))).toBe(true);
   });
 
   test('rewards harder missions with more XP', () => {
@@ -71,6 +117,7 @@ describe('generateDailyMissions', () => {
 
     const progress = {
       skillId: 'gym',
+      goalMode: 'daily',
       completedTopicIds: ['gym-l001', 'gym-l002', 'gym-l003', 'gym-l004', 'gym-l005'],
       dailyMinutes: 45,
     };

@@ -84,6 +84,25 @@ alter table user_skills enable row level security;
 alter table missions enable row level security;
 alter table activities enable row level security;
 
+drop policy if exists "profiles_select_own" on profiles;
+drop policy if exists "profiles_insert_own" on profiles;
+drop policy if exists "profiles_update_own" on profiles;
+
+drop policy if exists "roadmaps_select_authenticated" on roadmaps;
+drop policy if exists "roadmaps_insert_own_generated" on roadmaps;
+drop policy if exists "roadmaps_update_own_generated" on roadmaps;
+
+drop policy if exists "user_skills_select_own" on user_skills;
+drop policy if exists "user_skills_insert_own" on user_skills;
+drop policy if exists "user_skills_update_own" on user_skills;
+
+drop policy if exists "missions_select_own" on missions;
+drop policy if exists "missions_insert_own" on missions;
+drop policy if exists "missions_update_own" on missions;
+
+drop policy if exists "activities_select_own" on activities;
+drop policy if exists "activities_insert_own" on activities;
+
 create policy "profiles_select_own"
   on profiles for select
   using (auth.uid() = id);
@@ -101,6 +120,26 @@ create policy "roadmaps_select_authenticated"
   on roadmaps for select
   to authenticated
   using (true);
+
+create policy "roadmaps_insert_own_generated"
+  on roadmaps for insert
+  to authenticated
+  with check (
+    is_user_generated = true
+    and created_by_user_id = auth.uid()
+  );
+
+create policy "roadmaps_update_own_generated"
+  on roadmaps for update
+  to authenticated
+  using (
+    is_user_generated = true
+    and created_by_user_id = auth.uid()
+  )
+  with check (
+    is_user_generated = true
+    and created_by_user_id = auth.uid()
+  );
 
 create policy "user_skills_select_own"
   on user_skills for select
