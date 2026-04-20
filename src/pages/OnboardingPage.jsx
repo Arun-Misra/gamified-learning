@@ -61,7 +61,7 @@ export default function OnboardingPage() {
           goalType,
           goalMode,
           knowledgeLevel,
-          sourceGoalText: customGoal.trim(),
+          sourceGoalText: `${customGoal.trim()} ${targetOutcome.trim()}`.trim(),
         });
 
         await initializeUserSkill(user.uid, skillId, 'Custom', parsedMinutes, {

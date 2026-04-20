@@ -26,35 +26,46 @@ const setCachedRoadmap = (key, value) => {
 const DOMAIN_PLAYBOOKS = {
   study: {
     focus: 'knowledge mastery',
-    verbs: ['Decode', 'Practice', 'Apply', 'Explain', 'Refine'],
-    artifacts: ['study notes', 'practice drills', 'mini challenge', 'summary map', 'error log'],
-    outcomes: ['retain core concepts', 'improve speed and accuracy', 'build confidence under pressure'],
+    defaultPillars: ['Core Concepts', 'Deliberate Practice', 'Applied Problem Solving'],
+    actions: ['Decode', 'Practice', 'Apply', 'Explain', 'Refine', 'Benchmark'],
+    artifacts: ['study map', 'exercise set', 'mini project', 'review notes', 'error log'],
+    metrics: ['accuracy', 'speed', 'retention score'],
   },
   career: {
     focus: 'professional growth',
-    verbs: ['Map', 'Draft', 'Build', 'Present', 'Improve'],
-    artifacts: ['career plan', 'portfolio piece', 'interview story bank', 'case-study summary', 'iteration notes'],
-    outcomes: ['stronger role readiness', 'better communication', 'clear evidence of impact'],
+    defaultPillars: ['Role Fundamentals', 'Portfolio Evidence', 'Communication Skills'],
+    actions: ['Map', 'Draft', 'Build', 'Present', 'Improve', 'Validate'],
+    artifacts: ['career plan', 'portfolio item', 'interview story', 'feedback summary', 'iteration notes'],
+    metrics: ['clarity score', 'delivery confidence', 'impact evidence'],
   },
   health: {
     focus: 'physical progress',
-    verbs: ['Activate', 'Train', 'Track', 'Recover', 'Progress'],
-    artifacts: ['workout log', 'nutrition checkpoint', 'mobility routine', 'recovery scorecard', 'progress snapshot'],
-    outcomes: ['consistent training quality', 'better movement patterns', 'measurable energy improvements'],
+    defaultPillars: ['Movement Quality', 'Training Capacity', 'Recovery Discipline'],
+    actions: ['Activate', 'Train', 'Track', 'Recover', 'Progress', 'Stabilize'],
+    artifacts: ['workout log', 'mobility checklist', 'sleep summary', 'progress snapshot', 'meal log'],
+    metrics: ['consistency', 'form quality', 'recovery score'],
   },
   creative: {
     focus: 'creative output',
-    verbs: ['Explore', 'Sketch', 'Compose', 'Ship', 'Critique'],
-    artifacts: ['idea list', 'draft set', 'finished piece', 'feedback notes', 'revision pass'],
-    outcomes: ['more original output', 'faster iteration loops', 'stronger creative voice'],
+    defaultPillars: ['Idea Generation', 'Craft Skills', 'Publishing Rhythm'],
+    actions: ['Explore', 'Sketch', 'Compose', 'Ship', 'Critique', 'Remix'],
+    artifacts: ['idea list', 'draft set', 'finished piece', 'feedback notes', 'revision log'],
+    metrics: ['output volume', 'quality rating', 'iteration speed'],
   },
   custom: {
     focus: 'goal completion',
-    verbs: ['Research', 'Plan', 'Execute', 'Validate', 'Evolve'],
+    defaultPillars: ['Foundation', 'Execution', 'Iteration'],
+    actions: ['Research', 'Plan', 'Execute', 'Validate', 'Evolve', 'Systemize'],
     artifacts: ['checkpoint notes', 'execution log', 'mini deliverable', 'validation summary', 'next-step brief'],
-    outcomes: ['steady progress cadence', 'clear milestones', 'repeatable execution habits'],
+    metrics: ['completion rate', 'quality score', 'consistency'],
   },
 };
+
+const STOP_WORDS = new Set([
+  'the', 'and', 'for', 'with', 'from', 'into', 'your', 'that', 'this', 'those', 'these',
+  'learn', 'learning', 'become', 'be', 'get', 'improve', 'build', 'create', 'a', 'an', 'to',
+  'of', 'in', 'on', 'at', 'by', 'is', 'it', 'as', 'my', 'me', 'i', 'want', 'need', 'better',
+]);
 
 const PHASE_LIBRARY = [
   {
@@ -84,6 +95,20 @@ const PHASE_LIBRARY = [
   },
 ];
 
+const titleCase = (value = '') =>
+  value
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+const getTokens = (text = '') =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((word) => word.length >= 4 && !STOP_WORDS.has(word));
+
 const getPlaybook = (goalType, goalName) => {
   const normalizedType = (goalType || '').toLowerCase();
   if (DOMAIN_PLAYBOOKS[normalizedType]) {
@@ -96,6 +121,32 @@ const getPlaybook = (goalType, goalName) => {
   if (/(design|music|write|art|creative|content)/.test(text)) return DOMAIN_PLAYBOOKS.creative;
   if (/(learn|study|exam|course|code|programming|math)/.test(text)) return DOMAIN_PLAYBOOKS.study;
   return DOMAIN_PLAYBOOKS.custom;
+};
+
+const inferPillars = (goalName, sourceGoalText, goalType) => {
+  const combinedText = `${goalName || ''} ${sourceGoalText || ''}`.trim();
+  const playbook = getPlaybook(goalType, combinedText || goalName);
+  const tokenCounts = getTokens(combinedText).reduce((accumulator, token) => {
+    accumulator[token] = (accumulator[token] || 0) + 1;
+    return accumulator;
+  }, {});
+
+  const topTokens = Object.entries(tokenCounts)
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 3)
+    .map(([token]) => titleCase(token));
+
+  const inferred = topTokens.length ? topTokens : [];
+  const defaults = playbook.defaultPillars || [];
+
+  const pillars = [...inferred, ...defaults]
+    .filter((value, index, source) => value && source.indexOf(value) === index)
+    .slice(0, 4);
+
+  return {
+    playbook,
+    pillars: pillars.length ? pillars : defaults.slice(0, 3),
+  };
 };
 
 const getDifficultyByStage = (knowledgeLevel, stageRatio) => {
@@ -116,24 +167,25 @@ const buildDynamicTopic = ({
   goalName,
   playbook,
   phase,
+  pillar,
   level,
   totalLevels,
   knowledgeLevel,
 }) => {
   const stageRatio = level / Math.max(1, totalLevels);
   const difficulty = getDifficultyByStage(knowledgeLevel, stageRatio);
-  const verb = playbook.verbs[level % playbook.verbs.length];
+  const action = playbook.actions[level % playbook.actions.length];
   const artifact = playbook.artifacts[level % playbook.artifacts.length];
-  const outcome = playbook.outcomes[level % playbook.outcomes.length];
+  const metric = playbook.metrics[level % playbook.metrics.length];
 
   const estimatedMinutes = difficulty === 'easy' ? 20 : difficulty === 'medium' ? 30 : 40;
 
   return {
     topicId: `goal-l${String(level).padStart(3, '0')}`,
-    title: `${phase.label}: ${verb} ${goalName}`,
+    title: `${phase.label}: ${action} ${pillar}`,
     difficulty,
     estimatedMinutes,
-    task: `${verb} ${goalName} and produce a ${artifact}. Success outcome: ${outcome}.`,
+    task: `${action} ${pillar} for ${goalName}. Deliverable: ${artifact}. Measure success by ${metric}.`,
   };
 };
 
@@ -157,45 +209,59 @@ const mapRoadmapRow = (row) => {
   };
 };
 
-const createGoalTracks = (goalName, goalMode, goalType = 'custom', knowledgeLevel = 'beginner') => {
+export const buildPlannedTracks = ({
+  goalName,
+  goalMode,
+  goalType = 'custom',
+  knowledgeLevel = 'beginner',
+  sourceGoalText = '',
+}) => {
   const baseTitle = goalName || 'Custom Goal';
-  const playbook = getPlaybook(goalType, baseTitle);
+  const { playbook, pillars } = inferPillars(baseTitle, sourceGoalText, goalType);
 
   if (goalMode === 'daily') {
+    const loopTopics = [
+      {
+        phase: 'Foundation',
+        action: playbook.actions[0],
+        pillar: pillars[0] || playbook.defaultPillars[0],
+        difficulty: 'easy',
+        minutes: 20,
+      },
+      {
+        phase: 'Practice',
+        action: playbook.actions[1],
+        pillar: pillars[1] || pillars[0] || playbook.defaultPillars[1],
+        difficulty: 'medium',
+        minutes: 25,
+      },
+      {
+        phase: 'Application',
+        action: playbook.actions[2],
+        pillar: pillars[2] || pillars[0] || playbook.defaultPillars[2],
+        difficulty: 'medium',
+        minutes: 25,
+      },
+      {
+        phase: 'Review',
+        action: playbook.actions[3],
+        pillar: pillars[0] || playbook.defaultPillars[0],
+        difficulty: 'easy',
+        minutes: 15,
+      },
+    ];
+
     return [
       {
         trackId: 'daily-loop',
         title: `${baseTitle}: Daily Execution Loop`,
-        topics: [
-          {
-            topicId: 'daily-foundation',
-            title: `Daily Foundation: ${playbook.verbs[0]} ${baseTitle}`,
-            difficulty: 'easy',
-            estimatedMinutes: 20,
-            task: `${playbook.verbs[0]} ${baseTitle} using yesterday's notes and produce one ${playbook.artifacts[0]}.`,
-          },
-          {
-            topicId: 'daily-practice',
-            title: `Daily Practice: ${playbook.verbs[1]} ${baseTitle}`,
-            difficulty: 'medium',
-            estimatedMinutes: 25,
-            task: `Run focused repetitions for ${baseTitle}. Track one measurable metric in your ${playbook.artifacts[1]}.`,
-          },
-          {
-            topicId: 'daily-application',
-            title: `Daily Application: ${playbook.verbs[2]} ${baseTitle}`,
-            difficulty: 'medium',
-            estimatedMinutes: 25,
-            task: `Apply ${baseTitle} in a small real-world scenario and produce one ${playbook.artifacts[2]}.`,
-          },
-          {
-            topicId: 'daily-review',
-            title: `Daily Review: ${playbook.verbs[3]} progress`,
-            difficulty: 'easy',
-            estimatedMinutes: 15,
-            task: `Write 3 takeaways, capture one blocker, and define tomorrow's first action for ${baseTitle}.`,
-          },
-        ],
+        topics: loopTopics.map((loop, index) => ({
+          topicId: `daily-${loop.phase.toLowerCase()}`,
+          title: `Daily ${loop.phase}: ${loop.action} ${loop.pillar}`,
+          difficulty: loop.difficulty,
+          estimatedMinutes: loop.minutes,
+          task: `${loop.action} ${loop.pillar} for ${baseTitle}. Deliverable: ${playbook.artifacts[index % playbook.artifacts.length]}.`,
+        })),
       },
     ];
   }
@@ -209,10 +275,12 @@ const createGoalTracks = (goalName, goalMode, goalType = 'custom', knowledgeLeve
     const isLast = phaseIndex === activePhases.length - 1;
     const phaseCount = isLast ? levelCount - currentLevel + 1 : basePerPhase;
     const topics = Array.from({ length: phaseCount }, () => {
+      const pillar = pillars[(currentLevel - 1) % pillars.length] || playbook.defaultPillars[0];
       const topic = buildDynamicTopic({
         goalName: baseTitle,
         playbook,
         phase,
+        pillar,
         level: currentLevel,
         totalLevels: levelCount,
         knowledgeLevel,
@@ -229,6 +297,15 @@ const createGoalTracks = (goalName, goalMode, goalType = 'custom', knowledgeLeve
   });
 };
 
+const createGoalTracks = (goalName, goalMode, goalType = 'custom', knowledgeLevel = 'beginner', sourceGoalText = '') =>
+  buildPlannedTracks({
+    goalName,
+    goalMode,
+    goalType,
+    knowledgeLevel,
+    sourceGoalText,
+  });
+
 export const createUserGeneratedRoadmap = async ({
   uid,
   skillId,
@@ -238,7 +315,7 @@ export const createUserGeneratedRoadmap = async ({
   knowledgeLevel = 'beginner',
   sourceGoalText = '',
 }) => {
-  const tracks = createGoalTracks(goalName, goalMode, goalType, knowledgeLevel);
+  const tracks = createGoalTracks(goalName, goalMode, goalType, knowledgeLevel, sourceGoalText);
 
   const payload = {
     id: skillId,
