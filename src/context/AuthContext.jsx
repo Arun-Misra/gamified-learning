@@ -9,13 +9,24 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthChange((currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-      setError(null);
-    });
+    let unsubscribe;
 
-    return unsubscribe;
+    try {
+      unsubscribe = onAuthChange((currentUser) => {
+        setUser(currentUser);
+        setLoading(false);
+        setError(null);
+      });
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const value = {
