@@ -9,7 +9,8 @@ import {
   updateStreak,
 } from '../services/progressService';
 import { fetchRoadmapBySkill } from '../services/roadmapService';
-import { generateDailyMissions } from '../utils/missionGenerator';
+import { calculateXpReward, generateDailyMissions } from '../utils/missionGenerator';
+import { flattenRoadmapTopics, getLevelXpBonus } from '../utils/roadmapUtils';
 import { logActivity } from '../services/activityService';
 
 export default function MissionsPage() {
@@ -20,6 +21,9 @@ export default function MissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [completing, setCompleting] = useState(null);
+  const [levelCompleting, setLevelCompleting] = useState(null);
+  const [roadmapTopics, setRoadmapTopics] = useState([]);
+  const [completedTopicIds, setCompletedTopicIds] = useState([]);
 
   useEffect(() => {
     const loadMissions = async () => {
@@ -47,6 +51,10 @@ export default function MissionsPage() {
           setLoading(false);
           return;
         }
+
+        const allTopics = flattenRoadmapTopics(roadmap);
+        setRoadmapTopics(allTopics);
+        setCompletedTopicIds(userProgress.completedTopicIds || []);
 
         // Try to load existing missions for today
         let todaysMissions = await getMissionsForToday(user.uid, skillId);
@@ -121,11 +129,51 @@ export default function MissionsPage() {
             : m
         )
       );
+
+      if (topicId) {
+        setCompletedTopicIds((prev) => (prev.includes(topicId) ? prev : [...prev, topicId]));
+      }
     } catch (err) {
       setError(err.message);
       console.error('Error completing mission:', err);
     } finally {
       setCompleting(null);
+    }
+  };
+
+  const handleCompleteLevel = async (topic, levelNumber) => {
+    if (!user || !topic || completedTopicIds.includes(topic.topicId)) {
+      return;
+    }
+
+    try {
+      setLevelCompleting(topic.topicId);
+      const bonusXp = getLevelXpBonus(levelNumber);
+      const xpReward = calculateXpReward(topic.difficulty || 'medium', topic.estimatedMinutes || 25) + bonusXp;
+
+      await markTopicCompleted(user.uid, skillId, topic.topicId);
+      await awardXP(user.uid, skillId, xpReward);
+      await updateStreak(user.uid, skillId);
+      await logActivity({
+        uid: user.uid,
+        skillId,
+        missionId: null,
+        topicId: topic.topicId,
+        action: 'level_completed',
+        xpAwarded: xpReward,
+        meta: {
+          source: 'all-levels-panel',
+          levelNumber,
+          difficulty: topic.difficulty || 'medium',
+        },
+      });
+
+      setCompletedTopicIds((prev) => (prev.includes(topic.topicId) ? prev : [...prev, topic.topicId]));
+    } catch (err) {
+      setError(err.message || 'Failed to complete level');
+      console.error('Error completing level:', err);
+    } finally {
+      setLevelCompleting(null);
     }
   };
 
@@ -139,6 +187,7 @@ export default function MissionsPage() {
 
   const completedCount = missions.filter((m) => m.status === 'completed').length;
   const skillName = skillId.charAt(0).toUpperCase() + skillId.slice(1);
+  const completedLevelsCount = completedTopicIds.length;
 
   return (
     <div className="app-shell app-bg-grid">
@@ -157,6 +206,7 @@ export default function MissionsPage() {
           <div className="text-right card p-3 sm:p-4 min-w-[120px]">
             <p className="text-xs text-muted">Progress</p>
             <p className="text-2xl font-bold">{completedCount}/{missions.length}</p>
+            <p className="text-xs text-muted mt-1">Levels {completedLevelsCount}/{roadmapTopics.length}</p>
           </div>
         </div>
       </header>
@@ -252,6 +302,55 @@ export default function MissionsPage() {
             ))}
           </div>
         )}
+
+        <section className="card mt-8 reveal-up">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold">All Levels Visible</h2>
+            <span className="badge">{completedLevelsCount}/{roadmapTopics.length} completed</span>
+          </div>
+
+          <p className="text-sm text-muted mb-4">
+            You can complete levels beyond today&apos;s assigned missions and still earn XP.
+          </p>
+
+          <div className="max-h-[420px] overflow-y-auto pr-1 space-y-2">
+            {roadmapTopics.map((topic, index) => {
+              const levelNumber = index + 1;
+              const isCompleted = completedTopicIds.includes(topic.topicId);
+
+              return (
+                <div
+                  key={topic.topicId || `${topic.title}-${levelNumber}`}
+                  className={`rounded-xl border p-3 flex flex-wrap items-center justify-between gap-3 ${
+                    isCompleted
+                      ? 'bg-[#eaf6ee] border-[#b9decf]'
+                      : 'bg-[#fffef8] border-[#d8d2be]'
+                  }`}
+                >
+                  <div>
+                    <p className="font-semibold">Level {levelNumber}: {topic.title}</p>
+                    <p className="text-xs text-muted mt-1">
+                      {topic.difficulty || 'medium'} • {topic.estimatedMinutes || 25} mins • +
+                      {calculateXpReward(topic.difficulty || 'medium', topic.estimatedMinutes || 25) + getLevelXpBonus(levelNumber)} XP
+                    </p>
+                  </div>
+
+                  {isCompleted ? (
+                    <span className="badge">Completed</span>
+                  ) : (
+                    <button
+                      onClick={() => handleCompleteLevel(topic, levelNumber)}
+                      disabled={levelCompleting === topic.topicId}
+                      className="btn btn-secondary disabled:opacity-50"
+                    >
+                      {levelCompleting === topic.topicId ? 'Saving...' : 'Complete Level'}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </main>
     </div>
   );

@@ -131,12 +131,12 @@ Show:
 
 ---
 
-## 🗄️ Backend (Firebase / Supabase)
+## 🗄️ Backend (Supabase)
 
-Collections:
+Tables:
 
-* users
-* skills (user-specific progress)
+* profiles
+* user_skills (user-specific progress)
 * roadmaps (global structured data)
 * missions (daily generated)
 * activities (user logs)

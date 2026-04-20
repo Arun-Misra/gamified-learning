@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { initializeUserSkill } from '../services/progressService';
 
 export default function OnboardingPage() {
@@ -23,7 +23,7 @@ export default function OnboardingPage() {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Save to Firestore and navigate
+      // Save to Supabase and navigate
       setLoading(true);
       setError(null);
       try {
@@ -44,31 +44,38 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
-      <div className="card max-w-md w-full mx-4">
-        <h1 className="text-2xl font-bold mb-6">Set Up Your Journey</h1>
+    <div className="app-shell app-bg-grid flex items-center justify-center px-4 py-10">
+      <div className="card max-w-2xl w-full mx-4 reveal-up">
+        <div className="flex flex-wrap gap-2 items-center justify-between mb-6">
+          <h1 className="heading-display text-2xl sm:text-3xl">Set Up Your Journey</h1>
+          <span className="badge">Step {step} of 3</span>
+        </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-danger/10 text-danger rounded-lg text-sm">
+          <div className="mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700 border border-red-200">
             {error}
           </div>
         )}
 
         {step === 1 && (
           <div>
-            <h2 className="text-lg font-semibold mb-4">Choose a Category</h2>
-            <div className="space-y-2">
+            <h2 className="text-xl font-semibold mb-3">Choose a Category</h2>
+            <p className="text-muted text-sm mb-4">Start broad. You can add more skills later.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
-                  className={`w-full p-3 rounded-lg border-2 transition-all ${
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
                     category === cat
-                      ? 'border-primary bg-primary/10'
-                      : 'border-gray-200 hover:border-primary'
+                      ? 'border-[#1f7a5f] bg-[#1f7a5f14]'
+                      : 'border-[#d7d2be] hover:border-[#1f7a5f]'
                   }`}
                 >
-                  {cat}
+                  <p className="font-semibold">{cat}</p>
+                  <p className="text-xs text-muted mt-1">
+                    {cat === 'Study' ? 'Deep work and technical growth' : 'Fitness and physical progress'}
+                  </p>
                 </button>
               ))}
             </div>
@@ -77,20 +84,22 @@ export default function OnboardingPage() {
 
         {step === 2 && (
           <div>
-            <h2 className="text-lg font-semibold mb-4">Choose a Skill</h2>
-            <div className="space-y-2">
+            <h2 className="text-xl font-semibold mb-3">Choose a Skill</h2>
+            <p className="text-muted text-sm mb-4">Pick one skill to focus your daily routine.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {category &&
                 skillsByCategory[category].map((s) => (
                   <button
                     key={s}
                     onClick={() => setSkill(s)}
-                    className={`w-full p-3 rounded-lg border-2 transition-all ${
+                    className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
                       skill === s
-                        ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 hover:border-primary'
+                        ? 'border-[#1f7a5f] bg-[#1f7a5f14]'
+                        : 'border-[#d7d2be] hover:border-[#1f7a5f]'
                     }`}
                   >
-                    {s}
+                    <p className="font-semibold">{s}</p>
+                    <p className="text-xs text-muted mt-1">Daily quest track</p>
                   </button>
                 ))}
             </div>
@@ -99,7 +108,8 @@ export default function OnboardingPage() {
 
         {step === 3 && (
           <div>
-            <h2 className="text-lg font-semibold mb-4">Daily Time Commitment</h2>
+            <h2 className="text-xl font-semibold mb-3">Daily Time Commitment</h2>
+            <p className="text-muted text-sm mb-4">Set a realistic target you can sustain.</p>
             <input
               type="number"
               value={dailyMinutes}
@@ -109,7 +119,7 @@ export default function OnboardingPage() {
               min="5"
               max="480"
             />
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-muted mt-2">
               {dailyMinutes} minutes per day
             </p>
           </div>
@@ -141,8 +151,8 @@ export default function OnboardingPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className={`h-2 w-2 rounded-full transition-all ${
-                i <= step ? 'bg-primary' : 'bg-gray-300'
+              className={`h-2.5 rounded-full transition-all ${
+                i <= step ? 'w-8 bg-[#1f7a5f]' : 'w-2.5 bg-[#cec8b4]'
               }`}
             />
           ))}

@@ -1,17 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --ink: #13201b;
+    --muted: #4f655d;
+    --surface: #f6f4ea;
+    --surface-strong: #fffef8;
+    --line: #d5d0bd;
+    --brand: #1f7a5f;
+    --brand-deep: #155945;
+    --accent: #f5a524;
+    --danger: #c6474f;
+  }
+
   html {
     @apply scroll-smooth;
   }
 
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 18%, #f5d98f 0%, #f5d98f00 34%),
+      radial-gradient(circle at 88% 8%, #9fd4bf 0%, #9fd4bf00 36%),
+      linear-gradient(170deg, #f8f6ee 0%, #eef5f1 45%, #f4efe1 100%);
+    min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-bold;
   }
 
@@ -29,27 +54,131 @@
 }
 
 @layer components {
-  .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  .app-shell {
+    @apply min-h-screen;
   }
 
-  .btn-primary {
-    @apply bg-primary text-white hover:bg-purple-700 active:scale-95;
-  }
-
-  .btn-secondary {
-    @apply bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 active:scale-95;
-  }
-
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6;
-  }
-
-  .input {
-    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-purple-400;
+  .app-bg-grid {
+    background-image:
+      linear-gradient(to right, #d7d2be55 1px, transparent 1px),
+      linear-gradient(to bottom, #d7d2be55 1px, transparent 1px);
+    background-size: 34px 34px;
   }
 
   .container-app {
-    @apply max-w-7xl mx-auto px-4;
+    @apply max-w-6xl mx-auto px-4 sm:px-6;
+  }
+
+  .card {
+    @apply rounded-2xl p-6;
+    background: linear-gradient(180deg, var(--surface-strong), #f7f4ea);
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 28px #2129221a;
+  }
+
+  .card-strong {
+    @apply rounded-2xl p-6;
+    background: linear-gradient(180deg, #ffffff, #f8f6ef);
+    border: 1px solid #cabf9e;
+    box-shadow: 0 20px 50px #13201b20;
+  }
+
+  .btn {
+    @apply px-4 py-2.5 rounded-xl font-semibold transition-all duration-200;
+  }
+
+  .btn {
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary {
+    @apply text-white active:scale-95;
+    background: linear-gradient(160deg, var(--brand), var(--brand-deep));
+    box-shadow: 0 10px 18px #1f7a5f3a;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    @apply active:scale-95;
+    color: var(--ink);
+    background: #ece8d9;
+    border: 1px solid #cfc6a8;
+  }
+
+  .btn-secondary:hover {
+    background: #e4dec9;
+  }
+
+  .btn-danger {
+    @apply text-white active:scale-95;
+    background: linear-gradient(160deg, #d2575e, #ba414a);
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 rounded-xl bg-white focus:outline-none;
+    border: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 #ffffff;
+  }
+
+  .input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px #1f7a5f2b;
+  }
+
+  .heading-display {
+    @apply text-3xl sm:text-4xl font-bold leading-tight;
+    letter-spacing: -0.02em;
+    color: #0f1c18;
+  }
+
+  .text-muted {
+    color: var(--muted);
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+    border: 1px solid #cfccbc;
+    background: #efece0;
+    color: #32463f;
+  }
+
+  .progress-track {
+    @apply h-2.5 rounded-full overflow-hidden;
+    background: #ddd8c8;
+  }
+
+  .progress-fill {
+    @apply h-full rounded-full;
+    background: linear-gradient(90deg, #2f8a6c, #3ea57f);
+    transition: width 300ms ease;
+  }
+
+  .reveal-up {
+    animation: reveal-up 0.45s ease both;
+  }
+
+  .mission-card {
+    @apply card;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .mission-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 24px #13201b21;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
