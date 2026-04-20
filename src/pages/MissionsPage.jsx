@@ -337,18 +337,7 @@ export default function MissionsPage() {
                       {calculateXpReward(topic.difficulty || 'medium', topic.estimatedMinutes || 25) + getLevelXpBonus(levelNumber)} XP
                     </p>
                     <div className="mt-2">
-                      {topic.resourceUrl ? (
-                        <a
-                          href={topic.resourceUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs text-[#1f7a5f] hover:underline font-medium"
-                        >
-                          Open lesson resource
-                        </a>
-                      ) : (
-                        <span className="text-xs text-muted">Resource: Coming soon</span>
-                      )}
+                      <span className="text-xs text-muted">Resources and tests: Coming soon</span>
                     </div>
                   </div>
 
