@@ -169,6 +169,153 @@ values
   )
 ),
 (
+  'java',
+  'java',
+  'Study',
+  'Java Programming',
+  1,
+  (
+    with java_levels as (
+      select array[
+        'Install Java & IDE Setup',
+        'Hello World',
+        'Variables',
+        'Data Types',
+        'Type Casting',
+        'Operators',
+        'If-Else',
+        'Switch',
+        'While Loop',
+        'For Loop',
+        'Break/Continue',
+        'Arrays',
+        'Multidimensional Arrays',
+        'Strings',
+        'String Methods',
+        'Methods',
+        'Method Parameters',
+        'Method Overloading',
+        'Recursion',
+        'Basic Input (Scanner)',
+        'Math Class',
+        'Random Numbers',
+        'Wrapper Classes',
+        'Basic Debugging',
+        'Mini Project (Calculator)',
+        'Classes & Objects',
+        'Constructors',
+        'this keyword',
+        'Static keyword',
+        'Access Modifiers',
+        'Encapsulation',
+        'Inheritance',
+        'Method Overriding',
+        'Polymorphism',
+        'Abstraction',
+        'Interfaces',
+        'Multiple Inheritance',
+        'Object Class',
+        'toString()',
+        'equals()',
+        'HashCode',
+        'Packages',
+        'Import',
+        'Enums',
+        'Annotations',
+        'Exception Handling',
+        'try-catch-finally',
+        'throw/throws',
+        'Custom Exceptions',
+        'File Handling',
+        'File Read/Write',
+        'Serialization',
+        'Collections Intro',
+        'ArrayList',
+        'LinkedList',
+        'HashMap',
+        'HashSet',
+        'Iterator',
+        'Comparable vs Comparator',
+        'Mini Project (Library System)',
+        'Generics',
+        'Lambda Expressions',
+        'Functional Interfaces',
+        'Streams API',
+        'Optional Class',
+        'Multithreading',
+        'Thread Lifecycle',
+        'Synchronization',
+        'Executor Framework',
+        'Concurrency',
+        'JDBC',
+        'MySQL Connection',
+        'PreparedStatement',
+        'Connection Pooling',
+        'Transactions',
+        'Maven',
+        'Gradle',
+        'Logging (Log4j)',
+        'Testing (JUnit)',
+        'Debugging Advanced',
+        'REST APIs',
+        'JSON Handling',
+        'Spring Core',
+        'Spring Boot',
+        'Dependency Injection',
+        'Hibernate',
+        'JPA',
+        'Microservices Intro',
+        'Docker Basics',
+        'CI/CD Basics',
+        'Design Patterns',
+        'SOLID Principles',
+        'Clean Code',
+        'System Design Basics',
+        'Performance Optimization',
+        'Security Basics',
+        'Authentication (JWT)',
+        'Deployment',
+        'Capstone Project (Full App)',
+        'Mastery + Portfolio'
+      ]::text[] as titles
+    )
+    select jsonb_agg(
+      jsonb_build_object(
+        'trackId', format('java-track-%s', track_no),
+        'title', format('JAVA Levels %s-%s', ((track_no - 1) * 10) + 1, track_no * 10),
+        'topics', (
+          select jsonb_agg(
+            jsonb_build_object(
+              'topicId', format('java-l%03s', level_no),
+              'title', format(
+                'JAVA Level %s: %s',
+                level_no,
+                (select titles[level_no] from java_levels)
+              ),
+              'difficulty',
+              case
+                when level_no <= 25 then 'easy'
+                when level_no <= 60 then 'medium'
+                else 'hard'
+              end,
+              'estimatedMinutes',
+              case
+                when level_no <= 25 then 25
+                when level_no <= 60 then 35
+                else 50
+              end
+            )
+            order by level_no
+          )
+          from generate_series(((track_no - 1) * 10) + 1, track_no * 10) as level_no
+        )
+      )
+      order by track_no
+    )
+    from generate_series(1, 10) as track_no
+  )
+),
+(
   'gym',
   'gym',
   'Health',

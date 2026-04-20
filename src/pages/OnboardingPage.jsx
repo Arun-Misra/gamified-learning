@@ -15,7 +15,7 @@ export default function OnboardingPage() {
 
   const categories = ['Study', 'Health'];
   const skillsByCategory = {
-    Study: ['Python', 'DSA'],
+    Study: ['Python', 'DSA', 'Java'],
     Health: ['Gym'],
   };
 

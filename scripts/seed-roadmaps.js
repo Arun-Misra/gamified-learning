@@ -260,6 +260,109 @@ const gymTopicNames = [
   'Conditioning circuit challenge',
 ];
 
+const javaLevelEntries = [
+  { title: 'Install Java & IDE Setup', resourceUrl: 'https://www.oracle.com/java/technologies/downloads/' },
+  { title: 'Hello World', resourceUrl: 'https://www.w3schools.com/java/java_intro.asp' },
+  { title: 'Variables', resourceUrl: 'https://www.w3schools.com/java/java_variables.asp' },
+  { title: 'Data Types', resourceUrl: 'https://www.w3schools.com/java/java_data_types.asp' },
+  { title: 'Type Casting', resourceUrl: 'https://www.w3schools.com/java/java_type_casting.asp' },
+  { title: 'Operators', resourceUrl: 'https://www.w3schools.com/java/java_operators.asp' },
+  { title: 'If-Else', resourceUrl: 'https://www.w3schools.com/java/java_conditions.asp' },
+  { title: 'Switch', resourceUrl: 'https://www.w3schools.com/java/java_switch.asp' },
+  { title: 'While Loop', resourceUrl: 'https://www.w3schools.com/java/java_while_loop.asp' },
+  { title: 'For Loop', resourceUrl: 'https://www.w3schools.com/java/java_for_loop.asp' },
+  { title: 'Break/Continue', resourceUrl: 'https://www.w3schools.com/java/java_break.asp' },
+  { title: 'Arrays', resourceUrl: 'https://www.w3schools.com/java/java_arrays.asp' },
+  { title: 'Multidimensional Arrays', resourceUrl: 'https://www.w3schools.com/java/java_arrays_multi.asp' },
+  { title: 'Strings', resourceUrl: 'https://www.w3schools.com/java/java_strings.asp' },
+  { title: 'String Methods', resourceUrl: 'https://www.w3schools.com/java/java_ref_string.asp' },
+  { title: 'Methods', resourceUrl: 'https://www.w3schools.com/java/java_methods.asp' },
+  { title: 'Method Parameters', resourceUrl: 'https://www.w3schools.com/java/java_methods_param.asp' },
+  { title: 'Method Overloading', resourceUrl: 'https://www.javatpoint.com/method-overloading-in-java' },
+  { title: 'Recursion', resourceUrl: 'https://www.javatpoint.com/recursion-in-java' },
+  { title: 'Basic Input (Scanner)', resourceUrl: 'https://www.javatpoint.com/java-scanner' },
+  { title: 'Math Class', resourceUrl: 'https://www.w3schools.com/java/java_math.asp' },
+  { title: 'Random Numbers', resourceUrl: 'https://www.javatpoint.com/java-random' },
+  { title: 'Wrapper Classes', resourceUrl: 'https://www.javatpoint.com/wrapper-class-in-java' },
+  { title: 'Basic Debugging', resourceUrl: 'https://www.geeksforgeeks.org/debugging-in-java/' },
+  { title: 'Mini Project (Calculator)', resourceUrl: '' },
+  { title: 'Classes & Objects', resourceUrl: 'https://www.w3schools.com/java/java_classes.asp' },
+  { title: 'Constructors', resourceUrl: 'https://www.javatpoint.com/java-constructor' },
+  { title: 'this keyword', resourceUrl: 'https://www.javatpoint.com/this-keyword' },
+  { title: 'Static keyword', resourceUrl: 'https://www.javatpoint.com/static-keyword-in-java' },
+  { title: 'Access Modifiers', resourceUrl: 'https://www.javatpoint.com/access-modifiers' },
+  { title: 'Encapsulation', resourceUrl: 'https://www.javatpoint.com/encapsulation' },
+  { title: 'Inheritance', resourceUrl: 'https://www.javatpoint.com/inheritance-in-java' },
+  { title: 'Method Overriding', resourceUrl: 'https://www.javatpoint.com/method-overriding-in-java' },
+  { title: 'Polymorphism', resourceUrl: 'https://www.javatpoint.com/runtime-polymorphism-in-java' },
+  { title: 'Abstraction', resourceUrl: 'https://www.javatpoint.com/abstract-class-in-java' },
+  { title: 'Interfaces', resourceUrl: 'https://www.javatpoint.com/interface-in-java' },
+  { title: 'Multiple Inheritance', resourceUrl: 'https://www.javatpoint.com/multiple-inheritance-in-java' },
+  { title: 'Object Class', resourceUrl: 'https://www.javatpoint.com/object-class' },
+  { title: 'toString()', resourceUrl: 'https://www.javatpoint.com/tostring-method' },
+  { title: 'equals()', resourceUrl: 'https://www.javatpoint.com/equals-method' },
+  { title: 'HashCode', resourceUrl: 'https://www.javatpoint.com/hashcode-method' },
+  { title: 'Packages', resourceUrl: 'https://www.javatpoint.com/package' },
+  { title: 'Import', resourceUrl: 'https://www.javatpoint.com/import-keyword' },
+  { title: 'Enums', resourceUrl: 'https://www.javatpoint.com/java-enum' },
+  { title: 'Annotations', resourceUrl: 'https://www.javatpoint.com/java-annotation' },
+  { title: 'Exception Handling', resourceUrl: 'https://www.javatpoint.com/exception-handling-in-java' },
+  { title: 'try-catch-finally', resourceUrl: 'https://www.javatpoint.com/try-catch-block' },
+  { title: 'throw/throws', resourceUrl: 'https://www.javatpoint.com/throw-keyword' },
+  { title: 'Custom Exceptions', resourceUrl: 'https://www.javatpoint.com/custom-exception' },
+  { title: 'File Handling', resourceUrl: 'https://www.javatpoint.com/java-file' },
+  { title: 'File Read/Write', resourceUrl: 'https://www.javatpoint.com/java-filewriter' },
+  { title: 'Serialization', resourceUrl: 'https://www.javatpoint.com/serialization-in-java' },
+  { title: 'Collections Intro', resourceUrl: 'https://www.javatpoint.com/collections-in-java' },
+  { title: 'ArrayList', resourceUrl: 'https://www.javatpoint.com/arraylist' },
+  { title: 'LinkedList', resourceUrl: 'https://www.javatpoint.com/java-linkedlist' },
+  { title: 'HashMap', resourceUrl: 'https://www.javatpoint.com/java-hashmap' },
+  { title: 'HashSet', resourceUrl: 'https://www.javatpoint.com/java-hashset' },
+  { title: 'Iterator', resourceUrl: 'https://www.javatpoint.com/java-iterator' },
+  { title: 'Comparable vs Comparator', resourceUrl: 'https://www.javatpoint.com/difference-between-comparable-and-comparator' },
+  { title: 'Mini Project (Library System)', resourceUrl: '' },
+  { title: 'Generics', resourceUrl: 'https://www.javatpoint.com/generics-in-java' },
+  { title: 'Lambda Expressions', resourceUrl: 'https://www.javatpoint.com/java-lambda-expressions' },
+  { title: 'Functional Interfaces', resourceUrl: 'https://www.javatpoint.com/java-functional-interface' },
+  { title: 'Streams API', resourceUrl: 'https://www.javatpoint.com/java-8-stream' },
+  { title: 'Optional Class', resourceUrl: 'https://www.javatpoint.com/java-optional' },
+  { title: 'Multithreading', resourceUrl: 'https://www.javatpoint.com/multithreading-in-java' },
+  { title: 'Thread Lifecycle', resourceUrl: 'https://www.javatpoint.com/life-cycle-of-a-thread' },
+  { title: 'Synchronization', resourceUrl: 'https://www.javatpoint.com/synchronization-in-java' },
+  { title: 'Executor Framework', resourceUrl: 'https://www.javatpoint.com/java-executor-framework' },
+  { title: 'Concurrency', resourceUrl: 'https://www.javatpoint.com/java-concurrency' },
+  { title: 'JDBC', resourceUrl: 'https://www.javatpoint.com/java-jdbc' },
+  { title: 'MySQL Connection', resourceUrl: 'https://www.javatpoint.com/example-to-connect-to-mysql' },
+  { title: 'PreparedStatement', resourceUrl: 'https://www.javatpoint.com/preparedstatement-interface' },
+  { title: 'Connection Pooling', resourceUrl: 'https://www.javatpoint.com/connection-pooling' },
+  { title: 'Transactions', resourceUrl: 'https://www.javatpoint.com/transaction-management' },
+  { title: 'Maven', resourceUrl: 'https://www.javatpoint.com/maven-tutorial' },
+  { title: 'Gradle', resourceUrl: 'https://www.javatpoint.com/gradle-tutorial' },
+  { title: 'Logging (Log4j)', resourceUrl: 'https://www.javatpoint.com/log4j' },
+  { title: 'Testing (JUnit)', resourceUrl: 'https://www.javatpoint.com/junit-tutorial' },
+  { title: 'Debugging Advanced', resourceUrl: '' },
+  { title: 'REST APIs', resourceUrl: 'https://www.javatpoint.com/restful-web-services-tutorial' },
+  { title: 'JSON Handling', resourceUrl: 'https://www.javatpoint.com/json-in-java' },
+  { title: 'Spring Core', resourceUrl: 'https://www.javatpoint.com/spring-tutorial' },
+  { title: 'Spring Boot', resourceUrl: 'https://www.javatpoint.com/spring-boot-tutorial' },
+  { title: 'Dependency Injection', resourceUrl: '' },
+  { title: 'Hibernate', resourceUrl: 'https://www.javatpoint.com/hibernate-tutorial' },
+  { title: 'JPA', resourceUrl: 'https://www.javatpoint.com/jpa-tutorial' },
+  { title: 'Microservices Intro', resourceUrl: '' },
+  { title: 'Docker Basics', resourceUrl: 'https://www.javatpoint.com/docker-tutorial' },
+  { title: 'CI/CD Basics', resourceUrl: '' },
+  { title: 'Design Patterns', resourceUrl: 'https://www.javatpoint.com/design-patterns-in-java' },
+  { title: 'SOLID Principles', resourceUrl: '' },
+  { title: 'Clean Code', resourceUrl: '' },
+  { title: 'System Design Basics', resourceUrl: '' },
+  { title: 'Performance Optimization', resourceUrl: '' },
+  { title: 'Security Basics', resourceUrl: '' },
+  { title: 'Authentication (JWT)', resourceUrl: '' },
+  { title: 'Deployment', resourceUrl: '' },
+  { title: 'Capstone Project (Full App)', resourceUrl: '' },
+  { title: 'Mastery + Portfolio', resourceUrl: '' },
+];
+
 const getDifficultyForLevel = (level) => {
   if (level <= 30) return 'easy';
   if (level <= 70) return 'medium';
@@ -299,6 +402,32 @@ const createTracks = (skill, names) =>
     };
   });
 
+const createDetailedTracks = (skill, entries) =>
+  Array.from({ length: 10 }, (_, trackIndex) => {
+    const trackNo = trackIndex + 1;
+    const start = trackIndex * 10;
+    const end = start + 10;
+    const topics = entries.slice(start, end);
+
+    return {
+      trackId: `${skill}-track-${trackNo}`,
+      title: `${skill.toUpperCase()} Levels ${start + 1}-${end}`,
+      topics: topics.map((entry, offset) => {
+        const level = start + offset + 1;
+        const difficulty = level <= 25 ? 'easy' : level <= 60 ? 'medium' : 'hard';
+        const estimatedMinutes = difficulty === 'easy' ? 25 : difficulty === 'medium' ? 35 : 50;
+
+        return {
+          topicId: `${skill}-l${String(level).padStart(3, '0')}`,
+          title: `JAVA Level ${level}: ${entry.title}`,
+          difficulty,
+          estimatedMinutes,
+          resourceUrl: entry.resourceUrl || null,
+        };
+      }),
+    };
+  });
+
 const roadmaps = [
   {
     id: 'python',
@@ -315,6 +444,14 @@ const roadmaps = [
     name: 'Data Structures & Algorithms',
     version: 3,
     tracks: createTracks('dsa', dsaLevelTopics),
+  },
+  {
+    id: 'java',
+    skill_id: 'java',
+    category: 'Study',
+    name: 'Java Programming',
+    version: 1,
+    tracks: createDetailedTracks('java', javaLevelEntries),
   },
   {
     id: 'gym',
