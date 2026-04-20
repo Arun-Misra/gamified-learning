@@ -177,31 +177,33 @@ values
   (
     with java_levels as (
       select array[
-        'Install Java & IDE Setup',
-        'Hello World',
+        'What is Java',
+        'Install Java (JDK, JVM, JRE)',
+        'Hello World Program',
+        'Java Syntax',
         'Variables',
         'Data Types',
         'Type Casting',
         'Operators',
+        'User Input',
         'If-Else',
         'Switch',
-        'While Loop',
-        'For Loop',
-        'Break/Continue',
-        'Arrays',
-        'Multidimensional Arrays',
-        'Strings',
-        'String Methods',
+        'Loops (for, while, do-while)',
+        'Break & Continue',
         'Methods',
         'Method Parameters',
+        'Return Values',
         'Method Overloading',
-        'Recursion',
-        'Basic Input (Scanner)',
-        'Math Class',
-        'Random Numbers',
+        'Arrays',
+        'Multidimensional Arrays',
+        'Basic Practice Problems',
+        'Strings Basics',
+        'String Methods',
+        'StringBuilder',
+        'StringBuffer',
         'Wrapper Classes',
-        'Basic Debugging',
-        'Mini Project (Calculator)',
+        'Math Class',
+        'Date & Time',
         'Classes & Objects',
         'Constructors',
         'this keyword',
@@ -209,177 +211,73 @@ values
         'Access Modifiers',
         'Encapsulation',
         'Inheritance',
-        'Method Overriding',
         'Polymorphism',
         'Abstraction',
         'Interfaces',
-        'Multiple Inheritance',
-        'Object Class',
-        'toString()',
-        'equals()',
-        'HashCode',
         'Packages',
-        'Import',
         'Enums',
-        'Annotations',
-        'Exception Handling',
-        'try-catch-finally',
-        'throw/throws',
-        'Custom Exceptions',
-        'File Handling',
-        'File Read/Write',
-        'Serialization',
-        'Collections Intro',
+        'Practice OOP Programs',
         'ArrayList',
         'LinkedList',
         'HashMap',
         'HashSet',
-        'Iterator',
+        'TreeMap',
+        'TreeSet',
+        'Iterators',
         'Comparable vs Comparator',
-        'Mini Project (Library System)',
-        'Generics',
+        'Collections Utility',
+        'Stack',
+        'Queue',
+        'PriorityQueue',
+        'File Handling Basics',
+        'Reading Files',
+        'Writing Files',
+        'Exception Handling',
+        'Try-Catch',
+        'Throw & Throws',
+        'Custom Exceptions',
+        'Mini Project (File-based app)',
+        'Multithreading Basics',
+        'Thread Lifecycle',
+        'Runnable vs Thread',
+        'Synchronization',
+        'Deadlocks',
+        'Java Streams',
         'Lambda Expressions',
         'Functional Interfaces',
-        'Streams API',
         'Optional Class',
-        'Multithreading',
-        'Thread Lifecycle',
-        'Synchronization',
-        'Executor Framework',
-        'Concurrency',
-        'JDBC',
-        'MySQL Connection',
-        'PreparedStatement',
-        'Connection Pooling',
-        'Transactions',
-        'Maven',
-        'Gradle',
-        'Logging (Log4j)',
-        'Testing (JUnit)',
-        'Debugging Advanced',
-        'REST APIs',
-        'JSON Handling',
-        'Spring Core',
-        'Spring Boot',
+        'Java 8 Features',
+        'Serialization',
+        'Networking Basics',
+        'Sockets',
+        'JDBC Basics',
+        'Connect to Database',
+        'CRUD using JDBC',
+        'Reflection API',
+        'Annotations',
+        'Logging',
+        'Build CLI App',
+        'Design Patterns (Singleton, Factory)',
+        'MVC Architecture',
+        'REST API Basics',
+        'Spring Boot Intro',
+        'Build REST API',
         'Dependency Injection',
-        'Hibernate',
-        'JPA',
+        'Hibernate Basics',
+        'ORM Concepts',
+        'Security Basics',
+        'JWT Authentication',
         'Microservices Intro',
         'Docker Basics',
-        'CI/CD Basics',
-        'Design Patterns',
-        'SOLID Principles',
-        'Clean Code',
-        'System Design Basics',
+        'Testing (JUnit)',
+        'Mocking',
         'Performance Optimization',
-        'Security Basics',
-        'Authentication (JWT)',
-        'Deployment',
-        'Capstone Project (Full App)',
-        'Mastery + Portfolio'
-      ]::text[] as titles,
-      array[
-        'https://www.oracle.com/java/technologies/downloads/',
-        'https://www.w3schools.com/java/java_intro.asp',
-        'https://www.w3schools.com/java/java_variables.asp',
-        'https://www.w3schools.com/java/java_data_types.asp',
-        'https://www.w3schools.com/java/java_type_casting.asp',
-        'https://www.w3schools.com/java/java_operators.asp',
-        'https://www.w3schools.com/java/java_conditions.asp',
-        'https://www.w3schools.com/java/java_switch.asp',
-        'https://www.w3schools.com/java/java_while_loop.asp',
-        'https://www.w3schools.com/java/java_for_loop.asp',
-        'https://www.w3schools.com/java/java_break.asp',
-        'https://www.w3schools.com/java/java_arrays.asp',
-        'https://www.w3schools.com/java/java_arrays_multi.asp',
-        'https://www.w3schools.com/java/java_strings.asp',
-        'https://www.w3schools.com/java/java_ref_string.asp',
-        'https://www.w3schools.com/java/java_methods.asp',
-        'https://www.w3schools.com/java/java_methods_param.asp',
-        'https://www.javatpoint.com/method-overloading-in-java',
-        'https://www.javatpoint.com/recursion-in-java',
-        'https://www.javatpoint.com/java-scanner',
-        'https://www.w3schools.com/java/java_math.asp',
-        'https://www.javatpoint.com/java-random',
-        'https://www.javatpoint.com/wrapper-class-in-java',
-        'https://www.geeksforgeeks.org/debugging-in-java/',
-        '',
-        'https://www.w3schools.com/java/java_classes.asp',
-        'https://www.javatpoint.com/java-constructor',
-        'https://www.javatpoint.com/this-keyword',
-        'https://www.javatpoint.com/static-keyword-in-java',
-        'https://www.javatpoint.com/access-modifiers',
-        'https://www.javatpoint.com/encapsulation',
-        'https://www.javatpoint.com/inheritance-in-java',
-        'https://www.javatpoint.com/method-overriding-in-java',
-        'https://www.javatpoint.com/runtime-polymorphism-in-java',
-        'https://www.javatpoint.com/abstract-class-in-java',
-        'https://www.javatpoint.com/interface-in-java',
-        'https://www.javatpoint.com/multiple-inheritance-in-java',
-        'https://www.javatpoint.com/object-class',
-        'https://www.javatpoint.com/tostring-method',
-        'https://www.javatpoint.com/equals-method',
-        'https://www.javatpoint.com/hashcode-method',
-        'https://www.javatpoint.com/package',
-        'https://www.javatpoint.com/import-keyword',
-        'https://www.javatpoint.com/java-enum',
-        'https://www.javatpoint.com/java-annotation',
-        'https://www.javatpoint.com/exception-handling-in-java',
-        'https://www.javatpoint.com/try-catch-block',
-        'https://www.javatpoint.com/throw-keyword',
-        'https://www.javatpoint.com/custom-exception',
-        'https://www.javatpoint.com/java-file',
-        'https://www.javatpoint.com/java-filewriter',
-        'https://www.javatpoint.com/serialization-in-java',
-        'https://www.javatpoint.com/collections-in-java',
-        'https://www.javatpoint.com/arraylist',
-        'https://www.javatpoint.com/java-linkedlist',
-        'https://www.javatpoint.com/java-hashmap',
-        'https://www.javatpoint.com/java-hashset',
-        'https://www.javatpoint.com/java-iterator',
-        'https://www.javatpoint.com/difference-between-comparable-and-comparator',
-        '',
-        'https://www.javatpoint.com/generics-in-java',
-        'https://www.javatpoint.com/java-lambda-expressions',
-        'https://www.javatpoint.com/java-functional-interface',
-        'https://www.javatpoint.com/java-8-stream',
-        'https://www.javatpoint.com/java-optional',
-        'https://www.javatpoint.com/multithreading-in-java',
-        'https://www.javatpoint.com/life-cycle-of-a-thread',
-        'https://www.javatpoint.com/synchronization-in-java',
-        'https://www.javatpoint.com/java-executor-framework',
-        'https://www.javatpoint.com/java-concurrency',
-        'https://www.javatpoint.com/java-jdbc',
-        'https://www.javatpoint.com/example-to-connect-to-mysql',
-        'https://www.javatpoint.com/preparedstatement-interface',
-        'https://www.javatpoint.com/connection-pooling',
-        'https://www.javatpoint.com/transaction-management',
-        'https://www.javatpoint.com/maven-tutorial',
-        'https://www.javatpoint.com/gradle-tutorial',
-        'https://www.javatpoint.com/log4j',
-        'https://www.javatpoint.com/junit-tutorial',
-        '',
-        'https://www.javatpoint.com/restful-web-services-tutorial',
-        'https://www.javatpoint.com/json-in-java',
-        'https://www.javatpoint.com/spring-tutorial',
-        'https://www.javatpoint.com/spring-boot-tutorial',
-        '',
-        'https://www.javatpoint.com/hibernate-tutorial',
-        'https://www.javatpoint.com/jpa-tutorial',
-        '',
-        'https://www.javatpoint.com/docker-tutorial',
-        '',
-        'https://www.javatpoint.com/design-patterns-in-java',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        ''
-      ]::text[] as urls
+        'Memory Management',
+        'JVM Internals',
+        'Build Full Backend Project',
+        'Deploy Project',
+        'System Design Basics'
+      ]::text[] as titles
     )
     select jsonb_agg(
       jsonb_build_object(
@@ -406,8 +304,113 @@ values
                 when level_no <= 60 then 35
                 else 50
               end,
+              'task',
+              format('Study %s, then implement one small Java program to practice it.', (select titles[level_no] from java_levels)),
               'resourceUrl',
-              nullif((select urls[level_no] from java_levels), '')
+              case
+                when level_no = 1 then 'https://www.geeksforgeeks.org/java/java-programming-language/'
+                when level_no = 2 then 'https://www.geeksforgeeks.org/java/how-to-install-java-on-windows/'
+                when level_no = 3 then 'https://www.w3schools.com/java/java_intro.asp'
+                when level_no = 4 then 'https://www.w3schools.com/java/java_syntax.asp'
+                when level_no = 5 then 'https://www.w3schools.com/java/java_variables.asp'
+                when level_no = 6 then 'https://www.w3schools.com/java/java_data_types.asp'
+                when level_no = 7 then 'https://www.w3schools.com/java/java_type_casting.asp'
+                when level_no = 8 then 'https://www.w3schools.com/java/java_operators.asp'
+                when level_no = 9 then 'https://www.w3schools.com/java/java_user_input.asp'
+                when level_no = 10 then 'https://www.w3schools.com/java/java_conditions.asp'
+                when level_no = 11 then 'https://www.w3schools.com/java/java_switch.asp'
+                when level_no = 12 then 'https://www.w3schools.com/java/java_while_loop.asp'
+                when level_no = 13 then 'https://www.w3schools.com/java/java_break.asp'
+                when level_no = 14 then 'https://www.w3schools.com/java/java_methods.asp'
+                when level_no = 15 then 'https://www.w3schools.com/java/java_methods_param.asp'
+                when level_no = 16 then 'https://www.w3schools.com/java/java_methods_return.asp'
+                when level_no = 17 then 'https://www.geeksforgeeks.org/java/method-overloading-in-java/'
+                when level_no = 18 then 'https://www.w3schools.com/java/java_arrays.asp'
+                when level_no = 19 then 'https://www.w3schools.com/java/java_arrays_multi.asp'
+                when level_no = 20 then 'https://www.geeksforgeeks.org/java/java-programming-examples/'
+                when level_no = 21 then 'https://www.w3schools.com/java/java_strings.asp'
+                when level_no = 22 then 'https://www.w3schools.com/java/java_strings_methods.asp'
+                when level_no = 23 then 'https://www.geeksforgeeks.org/java/stringbuilder-class-in-java-with-examples/'
+                when level_no = 24 then 'https://www.geeksforgeeks.org/java/stringbuffer-class-in-java/'
+                when level_no = 25 then 'https://www.geeksforgeeks.org/java/wrapper-classes-java/'
+                when level_no = 26 then 'https://www.w3schools.com/java/java_math.asp'
+                when level_no = 27 then 'https://www.geeksforgeeks.org/java/date-class-java-examples/'
+                when level_no = 28 then 'https://www.w3schools.com/java/java_classes.asp'
+                when level_no = 29 then 'https://www.w3schools.com/java/java_constructors.asp'
+                when level_no = 30 then 'https://www.geeksforgeeks.org/java/this-reference-in-java/'
+                when level_no = 31 then 'https://www.w3schools.com/java/java_class_attributes.asp'
+                when level_no = 32 then 'https://www.w3schools.com/java/java_modifiers.asp'
+                when level_no = 33 then 'https://www.geeksforgeeks.org/java/encapsulation-in-java/'
+                when level_no = 34 then 'https://www.w3schools.com/java/java_inheritance.asp'
+                when level_no = 35 then 'https://www.w3schools.com/java/java_polymorphism.asp'
+                when level_no = 36 then 'https://www.w3schools.com/java/java_abstract.asp'
+                when level_no = 37 then 'https://www.w3schools.com/java/java_interface.asp'
+                when level_no = 38 then 'https://www.w3schools.com/java/java_packages.asp'
+                when level_no = 39 then 'https://www.w3schools.com/java/java_enums.asp'
+                when level_no = 40 then 'https://www.geeksforgeeks.org/java/object-oriented-programming-oops-concept-in-java/'
+                when level_no = 41 then 'https://www.w3schools.com/java/java_arraylist.asp'
+                when level_no = 42 then 'https://www.w3schools.com/java/java_linkedlist.asp'
+                when level_no = 43 then 'https://www.w3schools.com/java/java_hashmap.asp'
+                when level_no = 44 then 'https://www.w3schools.com/java/java_hashset.asp'
+                when level_no = 45 then 'https://www.geeksforgeeks.org/java/treemap-in-java-with-examples/'
+                when level_no = 46 then 'https://www.geeksforgeeks.org/java/treeset-in-java-with-examples/'
+                when level_no = 47 then 'https://www.geeksforgeeks.org/java/iterators-in-java/'
+                when level_no = 48 then 'https://www.geeksforgeeks.org/java/comparable-vs-comparator-in-java/'
+                when level_no = 49 then 'https://www.geeksforgeeks.org/java/collections-class-in-java/'
+                when level_no = 50 then 'https://www.geeksforgeeks.org/stack-class-in-java/'
+                when level_no = 51 then 'https://www.geeksforgeeks.org/queue-interface-java/'
+                when level_no = 52 then 'https://www.geeksforgeeks.org/priorityqueue-class-in-java-2/'
+                when level_no = 53 then 'https://www.w3schools.com/java/java_files.asp'
+                when level_no = 54 then 'https://www.w3schools.com/java/java_files_read.asp'
+                when level_no = 55 then 'https://www.w3schools.com/java/java_files_create.asp'
+                when level_no = 56 then 'https://www.w3schools.com/java/java_try_catch.asp'
+                when level_no = 57 then 'https://www.w3schools.com/java/java_try_catch.asp'
+                when level_no = 58 then 'https://www.geeksforgeeks.org/java/throw-throws-java/'
+                when level_no = 59 then 'https://www.geeksforgeeks.org/user-defined-custom-exception-in-java/'
+                when level_no = 60 then 'https://www.geeksforgeeks.org/java/file-handling-in-java/'
+                when level_no = 61 then 'https://www.geeksforgeeks.org/java/multithreading-in-java/'
+                when level_no = 62 then 'https://www.geeksforgeeks.org/java/lifecycle-and-states-of-a-thread-in-java/'
+                when level_no = 63 then 'https://www.geeksforgeeks.org/java/difference-between-thread-and-runnable-in-java/'
+                when level_no = 64 then 'https://www.geeksforgeeks.org/java/synchronization-in-java/'
+                when level_no = 65 then 'https://www.geeksforgeeks.org/deadlock-in-java-multithreading/'
+                when level_no = 66 then 'https://www.geeksforgeeks.org/stream-in-java/'
+                when level_no = 67 then 'https://www.geeksforgeeks.org/java/lambda-expressions-java-8/'
+                when level_no = 68 then 'https://www.geeksforgeeks.org/functional-interfaces-java/'
+                when level_no = 69 then 'https://www.geeksforgeeks.org/java-8-optional-class/'
+                when level_no = 70 then 'https://www.geeksforgeeks.org/java/java-8-features/'
+                when level_no = 71 then 'https://www.geeksforgeeks.org/serialization-in-java/'
+                when level_no = 72 then 'https://www.geeksforgeeks.org/computer-networks/networking-in-java/'
+                when level_no = 73 then 'https://www.geeksforgeeks.org/computer-networks/socket-programming-in-java/'
+                when level_no = 74 then 'https://www.geeksforgeeks.org/introduction-to-jdbc/'
+                when level_no = 75 then 'https://www.geeksforgeeks.org/java/how-to-connect-java-application-with-mysql-database/'
+                when level_no = 76 then 'https://www.geeksforgeeks.org/java/crud-operations-using-jdbc/'
+                when level_no = 77 then 'https://www.geeksforgeeks.org/java/reflection-in-java/'
+                when level_no = 78 then 'https://www.geeksforgeeks.org/java/annotations-in-java/'
+                when level_no = 79 then 'https://www.geeksforgeeks.org/java/logger-in-java-logging-example/'
+                when level_no = 80 then 'https://www.geeksforgeeks.org/command-line-arguments-in-java/'
+                when level_no = 81 then 'https://www.geeksforgeeks.org/system-design/singleton-class-java/'
+                when level_no = 82 then 'https://www.geeksforgeeks.org/software-engineering/mvc-design-pattern/'
+                when level_no = 83 then 'https://www.geeksforgeeks.org/rest-api-introduction/'
+                when level_no = 84 then 'https://www.geeksforgeeks.org/java/spring-boot/'
+                when level_no = 85 then 'https://www.geeksforgeeks.org/java/spring-boot-rest-api/'
+                when level_no = 86 then 'https://www.geeksforgeeks.org/spring-dependency-injection-with-example/'
+                when level_no = 87 then 'https://www.geeksforgeeks.org/java/hibernate-tutorial/'
+                when level_no = 88 then 'https://www.geeksforgeeks.org/spring-data-jpa-with-spring-boot/'
+                when level_no = 89 then 'https://www.geeksforgeeks.org/security-in-java/'
+                when level_no = 90 then 'https://www.geeksforgeeks.org/java/jwt-authentication-with-spring-boot/'
+                when level_no = 91 then 'https://www.geeksforgeeks.org/microservices-introduction/'
+                when level_no = 92 then 'https://www.geeksforgeeks.org/devops/docker-tutorial/'
+                when level_no = 93 then 'https://www.geeksforgeeks.org/software-testing/junit-tutorial/'
+                when level_no = 94 then 'https://www.geeksforgeeks.org/software-testing/mockito-tutorial/'
+                when level_no = 95 then 'https://www.geeksforgeeks.org/java/java-performance-tuning-tips/'
+                when level_no = 96 then 'https://www.geeksforgeeks.org/java/memory-management-in-java/'
+                when level_no = 97 then 'https://www.geeksforgeeks.org/java/jvm-works-jvm-architecture/'
+                when level_no = 98 then 'https://www.geeksforgeeks.org/full-stack-development/java-backend-roadmap/'
+                when level_no = 99 then 'https://www.geeksforgeeks.org/devops/deploy-spring-boot-application/'
+                when level_no = 100 then 'https://www.geeksforgeeks.org/system-design/system-design-tutorial/'
+                when level_no <= 60 then 'https://www.w3schools.com/java/default.asp'
+                else 'https://www.geeksforgeeks.org/java/'
+              end
             )
             order by level_no
           )

@@ -329,6 +329,9 @@ export default function MissionsPage() {
                 >
                   <div>
                     <p className="font-semibold">Level {levelNumber}: {topic.title}</p>
+                    {topic.task && (
+                      <p className="text-xs text-muted mt-1">{topic.task}</p>
+                    )}
                     <p className="text-xs text-muted mt-1">
                       {topic.difficulty || 'medium'} • {topic.estimatedMinutes || 25} mins • +
                       {calculateXpReward(topic.difficulty || 'medium', topic.estimatedMinutes || 25) + getLevelXpBonus(levelNumber)} XP
