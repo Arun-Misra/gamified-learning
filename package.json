@@ -7,10 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "preview": "vite preview",
+    "seed:roadmaps": "node scripts/seed-roadmaps.js",
+    "setup-all": "node scripts/setup-all.js",
+    "deploy:rules": "node scripts/deploy-rules.js"
   },
   "dependencies": {
-    "firebase": "^12.12.0",
+    "@supabase/supabase-js": "^2.104.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.1"
@@ -27,6 +32,7 @@
     "globals": "^17.5.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
-    "vite": "^8.0.9"
+    "vite": "^8.0.9",
+    "vitest": "^4.1.4"
   }
 }
