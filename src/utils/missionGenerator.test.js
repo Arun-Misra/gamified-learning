@@ -54,5 +54,32 @@ describe('generateDailyMissions', () => {
     expect(generateDailyMissions(roadmap, userProgress, 90)).toEqual([]);
   });
 
+  test('still creates daily gym missions even when all gym levels are completed', () => {
+    const gymRoadmap = {
+      skillId: 'gym',
+      tracks: [
+        {
+          topics: Array.from({ length: 5 }, (_, index) => ({
+            topicId: `gym-l${String(index + 1).padStart(3, '0')}`,
+            title: `Gym Level ${index + 1}`,
+            difficulty: 'medium',
+            estimatedMinutes: 25,
+          })),
+        },
+      ],
+    };
+
+    const progress = {
+      skillId: 'gym',
+      completedTopicIds: ['gym-l001', 'gym-l002', 'gym-l003', 'gym-l004', 'gym-l005'],
+      dailyMinutes: 45,
+    };
+
+    const missions = generateDailyMissions(gymRoadmap, progress, 45);
+
+    expect(missions.length).toBeGreaterThan(0);
+    expect(missions.some((mission) => mission.missionType === 'strength-block')).toBe(true);
+  });
+
   test.todo('Coming soon: generate skill-specific challenge templates per roadmap category');
 });

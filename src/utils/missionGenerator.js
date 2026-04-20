@@ -22,6 +22,13 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
 
   const incompleteTopics = allTopics.filter((topic) => !completedTopicIds.has(topic.topicId));
 
+  const resolvedSkillId = (userProgress.skillId || roadmap.skillId || '').toLowerCase();
+
+  if (resolvedSkillId === 'gym') {
+    const gymTopics = incompleteTopics.length ? incompleteTopics : buildGymMaintenanceTopics();
+    return buildGymDailyMissions(gymTopics, dailyMinutes);
+  }
+
   if (!incompleteTopics.length) {
     return [];
   }
@@ -143,6 +150,84 @@ export const generateDailyMissions = (roadmap, userProgress, dailyMinutes) => {
   return missions;
 };
 
+const buildGymMaintenanceTopics = () => [
+  { topicId: 'gym-maintenance-warmup', title: 'Mobility and Warm-up Flow', difficulty: 'easy', estimatedMinutes: 12 },
+  { topicId: 'gym-maintenance-strength', title: 'Strength Compound Session', difficulty: 'medium', estimatedMinutes: 30 },
+  { topicId: 'gym-maintenance-cardio', title: 'Conditioning Intervals', difficulty: 'medium', estimatedMinutes: 20 },
+  { topicId: 'gym-maintenance-core', title: 'Core Stability Circuit', difficulty: 'medium', estimatedMinutes: 15 },
+  { topicId: 'gym-maintenance-cooldown', title: 'Cooldown and Recovery', difficulty: 'easy', estimatedMinutes: 10 },
+];
+
+const buildGymDailyMissions = (topics, dailyMinutes) => {
+  const missionPlan = [
+    {
+      missionType: 'warmup-primer',
+      titlePrefix: 'Movement Primer',
+      minMinutes: 8,
+      fraction: 0.2,
+      difficultyFallback: 'easy',
+      criteria: ['Complete full warm-up sequence', 'Log how your body feels before and after'],
+    },
+    {
+      missionType: 'strength-block',
+      titlePrefix: 'Strength Block',
+      minMinutes: 16,
+      fraction: 0.4,
+      difficultyFallback: 'medium',
+      criteria: ['Finish main working sets', 'Track load, reps, and RPE for each set'],
+    },
+    {
+      missionType: 'conditioning-finisher',
+      titlePrefix: 'Conditioning Finisher',
+      minMinutes: 10,
+      fraction: 0.25,
+      difficultyFallback: 'medium',
+      criteria: ['Complete all rounds without skipping', 'Record total time or distance'],
+    },
+    {
+      missionType: 'recovery-review',
+      titlePrefix: 'Recovery Review',
+      minMinutes: 8,
+      fraction: 0.15,
+      difficultyFallback: 'easy',
+      criteria: ['Cool down with mobility work', 'Write one improvement for tomorrow'],
+    },
+  ];
+
+  let remainingTime = Math.max(20, dailyMinutes || 30);
+  const pool = topics.length ? topics : buildGymMaintenanceTopics();
+  const missions = [];
+
+  missionPlan.forEach((plan, index) => {
+    if (remainingTime < 8) {
+      return;
+    }
+
+    const topic = pool[index % pool.length];
+    const estimatedByFraction = Math.floor((dailyMinutes || 30) * plan.fraction);
+    const estimatedMinutes = Math.max(plan.minMinutes, Math.min(remainingTime, estimatedByFraction || plan.minMinutes));
+    const difficulty = topic?.difficulty || plan.difficultyFallback;
+
+    missions.push({
+      missionId: `mission-${topic?.topicId || 'gym'}-${Date.now()}-gym-${index}`,
+      topicId: topic?.topicId || null,
+      title: `${plan.titlePrefix}: ${topic?.title || 'Gym Session'}`,
+      description: `Execute ${topic?.title || 'today\'s gym mission'} with clean form and measurable effort.`,
+      successCriteria: plan.criteria,
+      missionType: plan.missionType,
+      difficulty,
+      estimatedMinutes,
+      xpReward: computeXpReward(difficulty, estimatedMinutes, plan.missionType),
+      status: 'pending',
+      completedAt: null,
+    });
+
+    remainingTime -= estimatedMinutes;
+  });
+
+  return missions;
+};
+
 const computeXpReward = (difficulty, estimatedMinutes, missionType) => {
   const difficultyMultiplier = {
     easy: 1,
@@ -156,6 +241,10 @@ const computeXpReward = (difficulty, estimatedMinutes, missionType) => {
     'applied-challenge': 9,
     'review-log': 4,
     'stretch-goal': 12,
+    'warmup-primer': 4,
+    'strength-block': 10,
+    'conditioning-finisher': 8,
+    'recovery-review': 4,
   };
 
   const base = Math.max(6, Math.floor(estimatedMinutes / 3));

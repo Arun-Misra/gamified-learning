@@ -5,7 +5,7 @@ values
   'python',
   'Study',
   'Python Programming',
-  2,
+  3,
   (
     select jsonb_agg(
       jsonb_build_object(
@@ -19,17 +19,47 @@ values
                 'Python Level %s: %s',
                 level_no,
                 (array[
-                  'Syntax and Variables',
-                  'Conditionals and Logic',
-                  'Loops and Iteration',
-                  'Functions and Scope',
-                  'Data Structures',
-                  'File Handling',
-                  'Error Handling',
-                  'Object-Oriented Design',
-                  'Testing and Debugging',
-                  'Applied Mini Project'
-                ])[1 + ((level_no - 1) % 10)]
+                  'Setup, Interpreter, and Tooling',
+                  'Variables, Types, and Casting',
+                  'Strings and String Methods',
+                  'Lists, Tuples, Sets, Dictionaries',
+                  'if/elif/else and boolean logic',
+                  'for/while loops and control flow',
+                  'Functions and parameters',
+                  'Scope, closures, lambda',
+                  'File I/O and pathlib',
+                  'Exception handling patterns',
+                  'Logging and debugging',
+                  'Regex and text parsing',
+                  'JSON and CSV processing',
+                  'Classes and object modeling',
+                  'Inheritance and polymorphism',
+                  'Decorators and context managers',
+                  'Type hints and dataclasses',
+                  'Iterators and generators',
+                  'unittest and pytest',
+                  'CLI apps with argparse/click',
+                  'HTTP APIs with requests',
+                  'Async/await with aiohttp',
+                  'NumPy and vectorization',
+                  'Pandas data wrangling',
+                  'Matplotlib and Seaborn',
+                  'Sorting: Bubble/Selection/Insertion',
+                  'Merge Sort implementation',
+                  'Quick Sort implementation',
+                  'Heap Sort with heapq',
+                  'Binary Search patterns',
+                  'BFS and DFS in Python',
+                  'Dynamic Programming memoization',
+                  'Backtracking templates',
+                  'Bit manipulation essentials',
+                  'Flask API fundamentals',
+                  'FastAPI with validation',
+                  'SQLAlchemy ORM basics',
+                  'Redis caching integration',
+                  'Dockerizing Python services',
+                  'Capstone implementation and review'
+                ])[1 + ((level_no - 1) % 40)]
               ),
               'difficulty',
               case
@@ -59,7 +89,7 @@ values
   'dsa',
   'Study',
   'Data Structures & Algorithms',
-  2,
+  3,
   (
     select jsonb_agg(
       jsonb_build_object(
@@ -73,17 +103,47 @@ values
                 'DSA Level %s: %s',
                 level_no,
                 (array[
-                  'Arrays and Strings',
-                  'Two Pointers and Sliding Window',
-                  'Stacks and Queues',
-                  'Linked Lists',
-                  'Hashing Patterns',
-                  'Trees and Traversals',
-                  'Graph Fundamentals',
-                  'Recursion and Backtracking',
-                  'Dynamic Programming',
-                  'Greedy and Advanced Challenges'
-                ])[1 + ((level_no - 1) % 10)]
+                  'Array traversal and updates',
+                  'Prefix sums and range queries',
+                  'Two pointers patterns',
+                  'Sliding window patterns',
+                  'Hash map frequency counting',
+                  'Stack-based expression handling',
+                  'Monotonic stack patterns',
+                  'Queue and deque problems',
+                  'Linked list reversal and cycles',
+                  'Binary search templates',
+                  'Bubble sort implementation',
+                  'Selection sort implementation',
+                  'Insertion sort implementation',
+                  'Merge sort divide-and-conquer',
+                  'Quick sort partition strategies',
+                  'Heap sort and priority queues',
+                  'Counting and radix sort',
+                  'Recursion and backtracking basics',
+                  'Subsets and permutations',
+                  'N-Queens backtracking',
+                  'Greedy interval scheduling',
+                  'Disjoint interval merge',
+                  'Tree DFS traversals',
+                  'Tree BFS level order',
+                  'BST insert/search/delete',
+                  'Trie and prefix matching',
+                  'Fenwick tree operations',
+                  'Segment tree range queries',
+                  'Graph adjacency structures',
+                  'BFS shortest path',
+                  'DFS connected components',
+                  'Topological sorting',
+                  'Dijkstra shortest path',
+                  'Bellman-Ford shortest path',
+                  'Union-Find / DSU',
+                  'Kruskal MST',
+                  'Prim MST',
+                  'Dynamic programming 1D/2D',
+                  'Knapsack and LIS',
+                  'Capstone mixed interview set'
+                ])[1 + ((level_no - 1) % 40)]
               ),
               'difficulty',
               case
@@ -113,8 +173,54 @@ values
   'gym',
   'Health',
   'Gym Fitness',
-  1,
-  '[{"trackId":"basics","title":"Fitness Basics","topics":[{"topicId":"gym-warmup","title":"Warm-up Routines","difficulty":"easy","estimatedMinutes":10},{"topicId":"gym-cardio","title":"Cardio Training","difficulty":"medium","estimatedMinutes":30},{"topicId":"gym-strength","title":"Strength Training","difficulty":"hard","estimatedMinutes":45}]}]'::jsonb
+  3,
+  (
+    select jsonb_agg(
+      jsonb_build_object(
+        'trackId', format('gym-track-%s', track_no),
+        'title', format('Gym Levels %s-%s', ((track_no - 1) * 10) + 1, track_no * 10),
+        'topics', (
+          select jsonb_agg(
+            jsonb_build_object(
+              'topicId', format('gym-l%03s', level_no),
+              'title', format(
+                'Gym Level %s: %s',
+                level_no,
+                (array[
+                  'Dynamic warm-up and activation',
+                  'Push-day strength fundamentals',
+                  'Pull-day strength fundamentals',
+                  'Leg-day strength fundamentals',
+                  'Core and stability circuit',
+                  'Cardio interval conditioning',
+                  'Mobility and recovery flow',
+                  'Progressive overload tracking',
+                  'Technique and tempo control',
+                  'Conditioning challenge set'
+                ])[1 + ((level_no - 1) % 10)]
+              ),
+              'difficulty',
+              case
+                when level_no <= 30 then 'easy'
+                when level_no <= 70 then 'medium'
+                else 'hard'
+              end,
+              'estimatedMinutes',
+              case
+                when level_no <= 30 then 20 + ((level_no - 1) % 3) * 5
+                when level_no <= 70 then 30 + ((level_no - 1) % 4) * 5
+                else 40 + ((level_no - 1) % 4) * 5
+              end
+            )
+            order by level_no
+          )
+          from generate_series(((track_no - 1) * 10) + 1, track_no * 10) as level_no
+        )
+      )
+      order by track_no
+    )
+    from generate_series(1, 10) as track_no
+  )
 )
 on conflict (id) do update
 set
